@@ -1,0 +1,259 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../../components/ui/tabs';
+import { Volume2Icon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+
+// Define interfaces for type safety
+interface SpeakingCard {
+  id: number | string;
+  prompt: string;
+  example: string;
+  hints: string[];
+}
+
+interface Category {
+  name: string;
+  cards: SpeakingCard[];
+}
+
+// Sample data for the speaking practice component
+const categories: Category[] = [
+  {
+    name: 'Business Travel',
+    cards: [
+      { 
+        id: 1, 
+        prompt: 'How do you ask for a flight delay update?', 
+        example: 'Excuse me, could you tell me if the flight to [destination] is delayed? I was wondering if you have any updates regarding the departure time.', 
+        hints: ['delay', 'update', 'departure time', 'wondering if'] 
+      },
+      { 
+        id: 2, 
+        prompt: 'How would you request an upgrade at a hotel?', 
+        example: 'Good afternoon. I was wondering if it might be possible to upgrade my room. I would be willing to pay an additional fee if necessary.', 
+        hints: ['upgrade', 'additional fee', 'wondering if', 'might be possible'] 
+      },
+      { 
+        id: 3, 
+        prompt: 'How do you arrange transportation from the airport?', 
+        example: 'I need to arrange transportation from the airport to my hotel. Could you tell me what options are available? Is there a shuttle service or should I take a taxi?', 
+        hints: ['arrange', 'transportation', 'shuttle service', 'options'] 
+      }
+    ],
+  },
+  {
+    name: 'Daily Conversations',
+    cards: [
+      { 
+        id: 1, 
+        prompt: 'How do you invite someone to have coffee?', 
+        example: 'Would you like to grab a coffee with me sometime this week? I know a great place nearby that just opened.', 
+        hints: ['grab a coffee', 'sometime', 'would you like to'] 
+      },
+      { 
+        id: 2, 
+        prompt: 'How do you ask for directions to the nearest bank?', 
+        example: 'Excuse me, could you tell me how to get to the nearest bank from here? Is it within walking distance?', 
+        hints: ['nearest', 'walking distance', 'how to get to'] 
+      },
+      { 
+        id: 3, 
+        prompt: 'How do you make a restaurant reservation by phone?', 
+        example: 'Hello, I would like to make a reservation for two people this Friday at 7:30 PM. Do you have any tables available at that time?', 
+        hints: ['make a reservation', 'available', 'would like to'] 
+      }
+    ],
+  },
+  {
+    name: 'Job Interviews',
+    cards: [
+      { 
+        id: 1, 
+        prompt: 'How do you talk about your strengths?', 
+        example: 'One of my greatest strengths is my ability to adapt to changing situations. For example, in my previous role, I had to quickly learn a new system when our company changed its software, and I was able to become proficient within two weeks.', 
+        hints: ['strengths', 'ability', 'previous role', 'for example'] 
+      },
+      { 
+        id: 2, 
+        prompt: 'How do you discuss your career goals?', 
+        example: 'In the next five years, I aim to develop my expertise in this field and take on more leadership responsibilities. I believe this position aligns well with that goal because it offers opportunities for growth and mentorship.', 
+        hints: ['aim to', 'leadership', 'aligns with', 'opportunities'] 
+      },
+      { 
+        id: 3, 
+        prompt: 'How do you answer "Why should we hire you?"', 
+        example: 'You should consider me for this position because I bring a unique combination of technical skills and communication abilities. My experience in similar projects demonstrates that I can deliver results efficiently while collaborating effectively with cross-functional teams.', 
+        hints: ['consider', 'unique combination', 'demonstrates', 'efficiently'] 
+      }
+    ],
+  }
+];
+
+const SpeakingPractice: React.FC = () => {
+  // State management
+  const [activeTab, setActiveTab] = useState<string>(categories[0].name);
+  const [currentCardIndex, setCurrentCardIndex] = useState<number>(0);
+  const [showExample, setShowExample] = useState<boolean>(false);
+  
+  // Refs
+  const isSpeakingRef = useRef<boolean>(false);
+  
+  // Get current category and card
+  const activeCategory = categories.find(category => category.name === activeTab) || categories[0];
+  const currentCard = activeCategory.cards[currentCardIndex];
+  
+  // Reset card index when changing tabs
+  useEffect(() => {
+    setCurrentCardIndex(0);
+    setShowExample(false);
+  }, [activeTab]);
+  
+  // Navigation functions
+  const goToNextCard = () => {
+    if (currentCardIndex < activeCategory.cards.length - 1) {
+      setCurrentCardIndex(prev => prev + 1);
+      setShowExample(false);
+    }
+  };
+  
+  const goToPrevCard = () => {
+    if (currentCardIndex > 0) {
+      setCurrentCardIndex(prev => prev - 1);
+      setShowExample(false);
+    }
+  };
+  
+  // Text-to-speech function
+  const speakText = (text: string) => {
+    if (isSpeakingRef.current) return; // Prevent overlap
+    
+    isSpeakingRef.current = true;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    utterance.onend = () => {
+      isSpeakingRef.current = false;
+    };
+    window.speechSynthesis.speak(utterance);
+  };
+  
+  return (
+    <div className="max-w-3xl mx-auto p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl shadow-xl min-h-screen flex flex-col items-center">
+      <h1 className="text-4xl font-bold text-indigo-900 mb-8 tracking-tight">Speaking Practice</h1>
+      
+      <Tabs 
+        value={activeTab} 
+        onValueChange={setActiveTab}
+        className="w-full"
+      >
+        <TabsList className="flex space-x-2 mb-6 overflow-x-auto">
+          {categories.map((category) => (
+            <TabsTrigger
+              key={category.name}
+              value={category.name}
+              className="px-5 py-3 rounded-lg text-lg font-semibold text-gray-800 bg-white border-2 border-transparent hover:bg-indigo-50 transition-colors data-[state=active]:bg-indigo-700 data-[state=active]:text-white data-[state=active]:border-indigo-300 shadow-sm"
+            >
+              {category.name}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        
+        {categories.map((category) => (
+          <TabsContent key={category.name} value={category.name} className="w-full">
+            <motion.div
+              key={`${category.name}-${currentCardIndex}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="p-6 bg-white border border-gray-200 rounded-xl shadow-lg w-full max-w-md mx-auto"
+              whileHover={{ scale: 1.02 }}
+            >
+              <h2 className="text-2xl font-bold text-indigo-800 text-center mb-6 px-4 py-3 border-b-2 border-indigo-200">
+                {currentCard.prompt}
+              </h2>
+              
+              {showExample && (
+                <div className="text-lg text-gray-800 text-center mb-6 p-5 bg-indigo-50 rounded-lg border-l-4 border-indigo-500 shadow-inner">
+                  {currentCard.example}
+                </div>
+              )}
+              
+              <div className="mt-8 bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                  <span className="bg-yellow-400 text-yellow-800 rounded-full w-6 h-6 inline-flex items-center justify-center mr-2">!</span>
+                  Helpful phrases:
+                </h3>
+                <ul className="text-base text-gray-700 list-disc pl-6 space-y-2">
+                  {currentCard.hints.map((hint, index) => (
+                    <li key={index} className="font-medium">{hint}</li>
+                  ))}
+                </ul>
+              </div>
+              
+              <div className="flex justify-center mt-6">
+                <motion.button
+                  onClick={() => {
+                    speakText(showExample ? currentCard.example : currentCard.prompt);
+                  }}
+                  className="px-5 py-3 bg-blue-700 text-white rounded-full hover:bg-blue-800 flex items-center gap-2 font-bold shadow-lg border border-blue-600"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Volume2Icon size={20} />
+                  Listen
+                </motion.button>
+                
+                <motion.button
+                  onClick={() => setShowExample(!showExample)}
+                  className="ml-6 px-5 py-3 bg-green-600 text-white rounded-full hover:bg-green-700 font-bold shadow-lg border border-green-500"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {showExample ? 'Hide Example' : 'Show Example'}
+                </motion.button>
+              </div>
+            </motion.div>
+            
+            <div className="flex justify-between mt-8 max-w-md w-full mx-auto">
+              <motion.button
+                onClick={goToPrevCard}
+                disabled={currentCardIndex === 0}
+                className={`px-6 py-3 rounded-full flex items-center gap-2 font-bold shadow-lg ${
+                  currentCardIndex === 0 
+                    ? 'bg-gray-400 cursor-not-allowed text-white opacity-60' 
+                    : 'bg-indigo-700 text-white hover:bg-indigo-800 border-2 border-indigo-500'
+                }`}
+                whileHover={currentCardIndex !== 0 ? { scale: 1.05 } : {}}
+                whileTap={currentCardIndex !== 0 ? { scale: 0.95 } : {}}
+              >
+                <ChevronLeftIcon size={20} />
+                Previous
+              </motion.button>
+              
+              <div className="flex items-center justify-center bg-white px-4 py-2 rounded-lg shadow text-gray-800 font-bold text-lg border-2 border-indigo-200">
+                {currentCardIndex + 1} / {activeCategory.cards.length}
+              </div>
+              
+              <motion.button
+                onClick={goToNextCard}
+                disabled={currentCardIndex === activeCategory.cards.length - 1}
+                className={`px-6 py-3 rounded-full flex items-center gap-2 font-bold shadow-lg ${
+                  currentCardIndex === activeCategory.cards.length - 1 
+                    ? 'bg-gray-400 cursor-not-allowed text-white opacity-60' 
+                    : 'bg-indigo-700 text-white hover:bg-indigo-800 border-2 border-indigo-500'
+                }`}
+                whileHover={currentCardIndex !== activeCategory.cards.length - 1 ? { scale: 1.05 } : {}}
+                whileTap={currentCardIndex !== activeCategory.cards.length - 1 ? { scale: 0.95 } : {}}
+              >
+                Next
+                <ChevronRightIcon size={20} />
+              </motion.button>
+            </div>
+          </TabsContent>
+        ))}
+      </Tabs>
+    </div>
+  );
+};
+
+export default SpeakingPractice;

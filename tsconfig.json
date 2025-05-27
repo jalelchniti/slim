@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ESNext", // Modern JavaScript (adjustable based on your needs)
+    "module": "ESNext", // ES Modules, compatible with Vite
+    "jsx": "react-jsx", // React 17+ JSX transform
+    "moduleResolution": "node", // Node.js-style module resolution
+    "esModuleInterop": true, // Enables interop between CommonJS and ES Modules
+    "forceConsistentCasingInFileNames": true, // Enforces consistent file casing
+    "strict": true, // Enables all strict type-checking options
+    "skipLibCheck": true, // Speeds up compilation by skipping library checks
+    "baseUrl": ".", // Base directory for relative paths
+    "paths": {
+      "@/*": ["src/*"] // Alias for src directory
+    }
+  },
+  "include": [
+    "src/**/*" // Only compile files in src/
+  ],
+  "exclude": [
+    "node_modules",
+    "dist" // Exclude build output
+  ]
+}

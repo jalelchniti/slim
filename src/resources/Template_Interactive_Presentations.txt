@@ -1,0 +1,237 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../../components/ui/tabs';
+import { 
+  Volume2, 
+  Wrench, 
+  Hammer, 
+  Scissors, 
+  Paintbrush, 
+  Ruler, 
+  CircuitBoard, 
+  Bolt, 
+  HeartPulse, 
+  Gauge, 
+  Microscope 
+} from 'lucide-react';
+
+// Define Interfaces
+interface VocabularyItem {
+  name: string;
+  icon: string; // Icon name (e.g., 'Wrench')
+  description: string;
+  examples: string[];
+}
+
+interface Category {
+  name: string;
+  items: VocabularyItem[];
+}
+
+// Icons mapping with proper typing
+const iconMap: { [key: string]: React.ComponentType<{ size?: number }> | undefined } = {
+  Wrench,
+  Hammer,
+  Scissors,
+  Paintbrush,
+  Ruler,
+  CircuitBoard,
+  Bolt,
+  HeartPulse,
+  Gauge,
+  Microscope,
+  // Screwdriver removed since it might not exist in your version
+};
+
+// Sample data - Replaced Screwdriver with a fallback icon
+const categories: Category[] = [
+  {
+    name: 'Hand Tools',
+    items: [
+      { 
+        name: 'Hammer', 
+        icon: 'Hammer', 
+        description: 'A tool with a heavy metal head mounted at right angles at the end of a handle, used for breaking things and driving in nails.', 
+        examples: ['I used a hammer to fix the shelf.', 'The carpenter swung the hammer with precision.'] 
+      },
+      { 
+        name: 'Screwdriver', 
+        icon: 'Wrench', // Fallback to Wrench if Screwdriver isn’t available
+        description: 'A tool with a flattened, cross-shaped, or star-shaped tip that fits into the head of a screw to turn it.', 
+        examples: ['I need a Phillips screwdriver for these screws.', 'The furniture kit includes a small screwdriver.'] 
+      },
+      { 
+        name: 'Wrench', 
+        icon: 'Wrench', 
+        description: 'A tool used for gripping and turning nuts, bolts, pipes, or other objects.', 
+        examples: ['Use an adjustable wrench to tighten the pipe fitting.', 'The mechanic needed a larger wrench for the stubborn bolt.'] 
+      },
+    ],
+  },
+  {
+    name: 'Art Supplies',
+    items: [
+      { 
+        name: 'Scissors', 
+        icon: 'Scissors', 
+        description: 'A cutting instrument consisting of two blades laid one on top of the other and fastened in the middle.', 
+        examples: ['The children used safety scissors for their art project.', 'These fabric scissors should only be used on cloth.'] 
+      },
+      { 
+        name: 'Paintbrush', 
+        icon: 'Paintbrush', 
+        description: 'A brush used to apply paint to a surface, typically with a wooden handle and bristles.', 
+        examples: ['She selected a fine paintbrush for the detailed work.', 'Clean your paintbrushes thoroughly after each use.'] 
+      },
+      { 
+        name: 'Ruler', 
+        icon: 'Ruler', 
+        description: 'A straight-edged strip of wood, metal, or plastic used to measure length or to draw straight lines.', 
+        examples: ['Use a ruler to make sure the margins are even.', 'The architect needed a longer ruler for the blueprint.'] 
+      },
+    ],
+  },
+  {
+    name: 'Electronics',
+    items: [
+      { 
+        name: 'Circuit Board', 
+        icon: 'CircuitBoard', 
+        description: 'A board that houses electronic components and connects them via conductive pathways.', 
+        examples: ['The circuit board was damaged by static electricity.', 'Modern circuit boards can contain millions of components.'] 
+      },
+      { 
+        name: 'Multimeter', 
+        icon: 'Gauge', 
+        description: 'An electronic measuring instrument that combines several measurement functions in one unit.', 
+        examples: ['Use the multimeter to check if the battery is working.', 'The electrician calibrated the multimeter before testing.'] 
+      },
+      { 
+        name: 'Voltage Tester', 
+        icon: 'Bolt', 
+        description: 'A device used to determine if an electrical circuit is active or not.', 
+        examples: ['Always use a voltage tester before working on electrical wires.', 'The voltage tester lit up, indicating power in the line.'] 
+      },
+    ],
+  },
+];
+
+const VocabularyExplorer: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<string>(categories[0].name);
+  const [selectedItem, setSelectedItem] = useState<VocabularyItem | null>(null);
+  const isSpeakingRef = useRef(false);
+
+  // Load voices on mount
+  useEffect(() => {
+    const loadVoices = () => {
+      window.speechSynthesis.getVoices(); // Trigger voice loading
+    };
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+    return () => { window.speechSynthesis.onvoiceschanged = null; };
+  }, []);
+
+  // Speech synthesis with overlap prevention
+  const speakText = (text: string) => {
+    if (!('speechSynthesis' in window) || isSpeakingRef.current) return;
+    isSpeakingRef.current = true;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    utterance.rate = 0.9;
+    utterance.onend = () => { isSpeakingRef.current = false; };
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // Get icon component with fallback
+  const getIconComponent = (iconName: string) => {
+    const IconComponent = iconMap[iconName] || Wrench; // Fallback to Wrench if icon not found
+    return IconComponent ? <IconComponent size={24} className="text-blue-600" /> : null;
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto p-6 bg-gray-100 rounded-xl min-h-screen">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="flex space-x-2 mb-6">
+          {categories.map((category) => (
+            <TabsTrigger
+              key={category.name}
+              value={category.name}
+              className="px-4 py-2 rounded-lg text-lg font-medium text-gray-700 bg-white hover:bg-blue-50 transition-colors data-[state=active]:bg-blue-700 data-[state=active]:text-white"
+            >
+              {category.name}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+
+        {categories.map((category) => (
+          <TabsContent key={category.name} value={category.name}>
+            <div className="grid grid-cols-3 gap-4">
+              {category.items.map((item) => (
+                <motion.div
+                  key={item.name}
+                  className="p-4 bg-white border border-gray-200 rounded-lg cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-all"
+                  whileHover={{ scale: 1.03 }}
+                  onClick={() => setSelectedItem(item)}
+                >
+                  <div className="flex items-center gap-3">
+                    {getIconComponent(item.icon)}
+                    <h3 className="text-xl font-semibold text-gray-900">{item.name}</h3>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </TabsContent>
+        ))}
+      </Tabs>
+
+      {selectedItem && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="p-6 bg-gray-50 border border-gray-300 rounded-lg mt-6"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {getIconComponent(selectedItem.icon)}
+              <h2 className="text-2xl font-semibold text-gray-900">{selectedItem.name}</h2>
+            </div>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => speakText(selectedItem.name)}
+              className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+              aria-label={`Pronounce ${selectedItem.name}`}
+            >
+              <Volume2 size={20} />
+            </motion.button>
+          </div>
+
+          <p className="text-base text-gray-700 mt-2">{selectedItem.description}</p>
+
+          <div className="mt-6">
+            <h3 className="text-lg font-medium text-gray-800 mb-2">Examples:</h3>
+            <ul className="space-y-2">
+              {selectedItem.examples.map((example, index) => (
+                <li key={index} className="text-base text-gray-700 italic flex items-center gap-2">
+                  "{example}"
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => speakText(example)}
+                    className="text-blue-600 hover:text-blue-800"
+                    aria-label={`Pronounce example ${index + 1}`}
+                  >
+                    <Volume2 size={16} />
+                  </motion.button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </motion.div>
+      )}
+    </div>
+  );
+};
+
+export default VocabularyExplorer;

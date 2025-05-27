@@ -1,0 +1,16 @@
+Here's a prompt you could use to request an AI system to create a listening quiz similar to the one we just fixed:
+
+"Create a React TypeScript component for an interactive English listening quiz. The quiz should:
+
+1. Include text-to-speech functionality that automatically reads each question aloud when displayed
+2. Allow students to hear the audio again by clicking a replay button
+3. Present multiple-choice questions with 4 possible answers per question
+4. Show immediate visual feedback (green for correct, red for incorrect) when an answer is selected
+5. Automatically advance to the next question after a brief delay
+6. Display a final score and review screen after all questions are answered
+7. Include a retry button to restart the quiz
+8. Use Tailwind CSS for styling with a clean, accessible interface
+9. Implement subtle animations using Framer Motion for button interactions
+10. Be structured around [SPECIFIC TOPIC] vocabulary/phrases (e.g., 'introductions', 'giving directions', 'shopping conversations')
+
+Please include 3-5 sample questions that demonstrate real-world language use relevant to the topic. Each question should have the spoken text, the question being asked about that text, and 4 multiple-choice options with one correct answer.

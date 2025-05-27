@@ -1,0 +1,336 @@
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Button } from '../../../components/ui/button';
+import { CheckSquare, ChevronLeft, ChevronRight, RefreshCcw, Volume2, VolumeX, Pause, Play } from 'lucide-react';
+
+const questions = [
+  { type: 'tf', text: 'You need to show your passport at the check-in counter.', options: ['True', 'False'], correct: 'False' },
+  { type: 'mc', text: 'What do you do after your group is called for boarding?', options: ['Go to the check-in counter', 'Proceed to the gate and board the plane', 'Wait in the lounge', 'Collect your luggage'], correct: 'Proceed to the gate and board the plane' },
+  { type: 'typeIn', text: 'What is the process of reserving a flight online called?', correct: 'Book it on the airline website.' },
+  { type: 'tf', text: 'Customs officers check your boarding pass after landing.', options: ['True', 'False'], correct: 'False' },
+  { type: 'mc', text: 'What do you hear when the plane lands?', options: ['Safety instructions', 'The arrival announcement', 'The departure announcement', 'In-flight entertainment'], correct: 'The arrival announcement' },
+  { type: 'typeIn', text: 'Where might you wait between connecting flights?', correct: 'During a layover.' },
+  { type: 'tf', text: 'You show your luggage to get on the plane.', options: ['True', 'False'], correct: 'False' },
+  { type: 'matching', text: 'Match the travel term with its description.', pairs: [
+    { term: 'Check-in counter', description: 'Where you register for your flight.' },
+    { term: 'Boarding pass', description: 'Document needed to get on the plane.' },
+    { term: 'Layover', description: 'Waiting period between connecting flights.' },
+    { term: 'Customs officers', description: 'Officials who check your passport after landing.' },
+  ]},
+  { type: 'mc', text: 'When does the flight leave the gate?', options: ['At check-in time', 'At arrival time', 'At departure time', 'At boarding time'], correct: 'At departure time' },
+  { type: 'typeIn', text: 'What do you pack before a trip?', correct: 'Your luggage.' },
+];
+
+const passageText = `Every trip starts at the check-in counter. You sign up for your flight there and check your information. When your group is called, you go to the gate and get on the plane. The airline staff tell you what to do. If you like planning early, booking a flight online is easy—just use the airline’s website. When the plane leaves the runway, your trip begins. After landing, customs officers look at your passport to check who you are and your papers. Before any trip, you pack your bags with what you need. The plane leaves the gate at departure time, so be on time. You show your boarding pass to the gate staff to get on the plane. When the plane lands, you hear an arrival message, which means the flight is over. If you have connecting flights, you wait during a layover. It’s a chance to walk or rest before your next flight. Each step helps you travel smoothly and safely.`;
+
+const ReadingComprehensionQuiz = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | { term: string; description: string } | null>(null);
+  const [userAnswers, setUserAnswers] = useState<(string | { term: string; description: string } | null)[]>(Array(questions.length).fill(null));
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [highlightedSentence, setHighlightedSentence] = useState<number | null>(null);
+
+  const currentQuestion = questions[currentIndex];
+  const sentences = passageText.split('. ').map(s => s.trim() + '.');
+
+  useEffect(() => {
+    const loadVoices = () => setVoices(window.speechSynthesis.getVoices());
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+    return () => { window.speechSynthesis.onvoiceschanged = null; };
+  }, []);
+
+  const speakPassage = () => {
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      setIsPaused(false);
+      setHighlightedSentence(null);
+      return;
+    }
+
+    setIsSpeaking(true);
+    let sentenceIndex = highlightedSentence || 0;
+    const speakNextSentence = () => {
+      if (sentenceIndex >= sentences.length) {
+        setIsSpeaking(false);
+        setIsPaused(false);
+        setHighlightedSentence(null);
+        return;
+      }
+
+      const utterance = new SpeechSynthesisUtterance(sentences[sentenceIndex]);
+      utterance.lang = 'en-GB';
+      utterance.rate = 0.8;
+      utterance.voice = voices.find(v => v.lang === 'en-GB') || voices[0];
+      utterance.onstart = () => setHighlightedSentence(sentenceIndex);
+      utterance.onend = () => {
+        sentenceIndex++;
+        if (!isPaused) speakNextSentence();
+      };
+      window.speechSynthesis.speak(utterance);
+    };
+
+    speakNextSentence();
+  };
+
+  const pauseReading = () => {
+    if (isSpeaking && !isPaused) {
+      window.speechSynthesis.pause();
+      setIsPaused(true);
+    }
+  };
+
+  const resumeReading = () => {
+    if (isSpeaking && isPaused) {
+      window.speechSynthesis.resume();
+      setIsPaused(false);
+      if (highlightedSentence !== null) {
+        const speakNext = () => {
+          if (!window.speechSynthesis.paused && !window.speechSynthesis.speaking) speakPassage();
+        };
+        setTimeout(speakNext, 100);
+      }
+    }
+  };
+
+  const handleNext = () => {
+    if (currentIndex < questions.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+      setSelectedAnswer(null);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+      setSelectedAnswer(null);
+    }
+  };
+
+  const handleSelect = (answer: string) => {
+    const newAnswers = [...userAnswers];
+    newAnswers[currentIndex] = answer;
+    setUserAnswers(newAnswers);
+    setSelectedAnswer(answer);
+  };
+
+  const handleTypeInChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newAnswers = [...userAnswers];
+    newAnswers[currentIndex] = e.target.value;
+    setUserAnswers(newAnswers);
+    setSelectedAnswer(e.target.value);
+  };
+
+  const handleMatchingChange = (term: string, description: string) => {
+    const newAnswers = [...userAnswers];
+    newAnswers[currentIndex] = { term, description };
+    setUserAnswers(newAnswers);
+    setSelectedAnswer({ term, description });
+  };
+
+  const handleSubmit = () => {
+    setIsSubmitted(true);
+    setIsSpeaking(false);
+    setIsPaused(false);
+    window.speechSynthesis.cancel();
+    setHighlightedSentence(null);
+  };
+
+  const handleReset = () => {
+    setCurrentIndex(0);
+    setSelectedAnswer(null);
+    setUserAnswers(Array(questions.length).fill(null));
+    setIsSubmitted(false);
+    setIsSpeaking(false);
+    setIsPaused(false);
+    window.speechSynthesis.cancel();
+    setHighlightedSentence(null);
+  };
+
+  const isCorrect = (index: number) => {
+    if (questions[index].type === 'matching') {
+      const answer = userAnswers[index] as { term: string; description: string } | null;
+      return answer && answer.term === questions[index].pairs.find((pair) => pair.description === answer.description)?.term;
+    }
+    return userAnswers[index] === questions[index].correct;
+  };
+
+  const totalScore = userAnswers.filter((_, index) => isCorrect(index)).length;
+
+  return (
+    <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden min-h-screen flex flex-col">
+      <header className="bg-blue-800 text-white p-6 flex items-center justify-between">
+        <h3 className="text-4xl font-bold">On Travel</h3>
+        <div className="flex gap-3">
+          <Button
+            onClick={speakPassage}
+            disabled={voices.length === 0}
+            className={`px-5 py-2.5 ${isSpeaking ? 'bg-red-700 hover:bg-red-800' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-full flex items-center gap-2 text-lg`}
+          >
+            {isSpeaking ? <VolumeX size={20} /> : <Volume2 size={20} />}
+            {isSpeaking ? 'Stop' : 'Read'}
+          </Button>
+          <Button
+            onClick={pauseReading}
+            disabled={!isSpeaking || isPaused}
+            className={`px-5 py-2.5 ${!isSpeaking || isPaused ? 'bg-gray-500' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-full flex items-center gap-2 text-lg`}
+          >
+            <Pause size={20} />
+            Pause
+          </Button>
+          <Button
+            onClick={resumeReading}
+            disabled={!isSpeaking || !isPaused}
+            className={`px-5 py-2.5 ${!isSpeaking || !isPaused ? 'bg-gray-500' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-full flex items-center gap-2 text-lg`}
+          >
+            <Play size={20} />
+            Resume
+          </Button>
+        </div>
+      </header>
+
+      <div className="p-6 flex-1 flex flex-col">
+        <p className="text-lg text-black mb-6 leading-relaxed">
+          {sentences.map((sentence, idx) => (
+            <span
+              key={idx}
+              className={`transition-all duration-300 ${highlightedSentence === idx ? 'bg-yellow-300 rounded px-2 py-1 font-semibold' : ''}`}
+            >
+              {sentence}{' '}
+            </span>
+          ))}
+        </p>
+
+        {isSubmitted ? (
+          <div className="flex-1 flex flex-col items-center justify-center">
+            <h2 className="text-3xl font-bold text-blue-700 mb-4">Quiz Complete!</h2>
+            <p className="text-xl text-black mb-6">
+              Score: {totalScore} / {questions.length}
+            </p>
+            <Button onClick={handleReset} className="px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 flex items-center gap-2 text-lg">
+              <RefreshCcw size={20} />
+              Try Again
+            </Button>
+          </div>
+        ) : (
+          <>
+            <div className="mb-6 flex justify-between items-center">
+              <p className="text-lg font-semibold text-black">
+                Question {currentIndex + 1} of {questions.length}
+              </p>
+            </div>
+
+            <motion.div
+              key={currentIndex}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4 }}
+              className="bg-gray-50 p-6 rounded-xl shadow-md mb-6 flex-1"
+            >
+              <h2 className="text-2xl font-bold text-blue-700 mb-4">{currentQuestion.text}</h2>
+
+              {currentQuestion.type === 'mc' && (
+                <div className="grid gap-4">
+                  {currentQuestion.options.map((option, idx) => (
+                    <Button
+                      key={idx}
+                      onClick={() => handleSelect(option)}
+                      className={`p-4 rounded-xl text-left flex items-center border-2 transition-all text-lg ${
+                        selectedAnswer === option
+                          ? 'bg-blue-100 border-blue-500 text-blue-800 font-semibold'
+                          : 'bg-white border-gray-300 text-black hover:bg-blue-50 hover:border-blue-400'
+                      }`}
+                    >
+                      <div className="w-7 h-7 rounded-full border-2 flex-shrink-0 flex items-center justify-center mr-3">
+                        {selectedAnswer === option && <CheckSquare size={18} className="text-blue-700" />}
+                      </div>
+                      {option}
+                    </Button>
+                  ))}
+                </div>
+              )}
+
+              {currentQuestion.type === 'tf' && (
+                <div className="grid gap-4">
+                  {currentQuestion.options.map((option, idx) => (
+                    <Button
+                      key={idx}
+                      onClick={() => handleSelect(option)}
+                      className={`p-4 rounded-xl text-left flex items-center border-2 transition-all text-lg ${
+                        selectedAnswer === option
+                          ? 'bg-blue-100 border-blue-500 text-blue-800 font-semibold'
+                          : 'bg-white border-gray-300 text-black hover:bg-blue-50 hover:border-blue-400'
+                      }`}
+                    >
+                      <div className="w-7 h-7 rounded-full border-2 flex-shrink-0 flex items-center justify-center mr-3">
+                        {selectedAnswer === option && <CheckSquare size={18} className="text-blue-700" />}
+                      </div>
+                      {option}
+                    </Button>
+                  ))}
+                </div>
+              )}
+
+              {currentQuestion.type === 'typeIn' && (
+                <input
+                  type="text"
+                  value={selectedAnswer || ''}
+                  onChange={handleTypeInChange}
+                  className="w-full p-4 rounded-xl border-2 border-gray-300 text-lg text-black focus:border-blue-500 focus:ring-blue-500 outline-none"
+                  placeholder="Type your answer here..."
+                />
+              )}
+
+              {currentQuestion.type === 'matching' && (
+                <div className="grid gap-4">
+                  {currentQuestion.pairs.map((pair, idx) => (
+                    <div key={idx} className="flex items-center justify-between">
+                      <span className="text-lg text-black font-medium">{pair.term}</span>
+                      <select
+                        value={(selectedAnswer as { term: string; description: string } | null)?.term === pair.term ? (selectedAnswer as { term: string; description: string }).description : ''}
+                        onChange={(e) => handleMatchingChange(pair.term, e.target.value)}
+                        className="p-3 rounded-xl border-2 border-gray-300 text-lg text-black focus:border-blue-500 focus:ring-blue-500 outline-none"
+                      >
+                        <option value="" disabled>Select</option>
+                        {currentQuestion.pairs.map((p, i) => (
+                          <option key={i} value={p.description}>{p.description}</option>
+                        ))}
+                      </select>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </motion.div>
+
+            <div className="flex justify-between mt-6">
+              <Button onClick={handlePrevious} disabled={currentIndex === 0} className="px-5 py-2.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 flex items-center gap-2 text-lg">
+                <ChevronLeft size={20} />
+                Previous
+              </Button>
+              <Button onClick={handleNext} disabled={currentIndex === questions.length - 1} className="px-5 py-2.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 flex items-center gap-2 text-lg">
+                Next
+                <ChevronRight size={20} />
+              </Button>
+            </div>
+
+            {currentIndex === questions.length - 1 && (
+              <div className="flex justify-center mt-6">
+                <Button onClick={handleSubmit} className="px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 flex items-center gap-2 text-lg">
+                  <CheckSquare size={20} />
+                  Submit
+                </Button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default ReadingComprehensionQuiz;

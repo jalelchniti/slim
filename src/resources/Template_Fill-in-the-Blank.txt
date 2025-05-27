@@ -1,0 +1,322 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { Button } from '../../../components/ui/button';
+import { Input } from '../../../components/ui/input';
+import { Volume2 } from 'lucide-react';
+
+// Define interfaces for the quiz data structure
+interface Blank {
+  id: number | string;
+  correct: string;
+  placeholder: string;
+}
+
+interface QuizData {
+  text: string;
+  blanks: Blank[];
+  wordBank: string[];
+  notes?: string;
+}
+
+// Example quiz data
+const quizData: QuizData = {
+  text: 'I need to ____ a flight and ____ my luggage.',
+  blanks: [
+    { id: 1, correct: 'book', placeholder: '____' },
+    { id: 2, correct: 'check', placeholder: '____' },
+  ],
+  wordBank: ['book', 'check', 'delay', 'cancel'],
+  notes: 'Use "book" for reservations and "check" for luggage.',
+};
+
+const FillInBlankQuiz: React.FC = () => {
+  // State for user answers (mapping blank IDs to user inputs)
+  const [userAnswers, setUserAnswers] = useState<Record<string | number, string>>({});
+  // State for checking if answers have been submitted for validation
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  // State for tracking score
+  const [score, setScore] = useState<number | null>(null);
+  // State for highlight style of each blank (correct/incorrect)
+  const [blankStatus, setBlankStatus] = useState<Record<string | number, 'correct' | 'incorrect' | 'default'>>({});
+  // Reference to prevent audio overlap
+  const isSpeakingRef = useRef(false);
+  // State to track if answers have been revealed
+  const [isRevealed, setIsRevealed] = useState(false);
+  // State to track the currently selected blank for word bank input
+  const [selectedBlankId, setSelectedBlankId] = useState<string | number | null>(null);
+
+  // Initialize blank statuses and user answers
+  useEffect(() => {
+    const initialBlankStatus: Record<string | number, 'correct' | 'incorrect' | 'default'> = {};
+    const initialUserAnswers: Record<string | number, string> = {};
+    
+    quizData.blanks.forEach(blank => {
+      initialBlankStatus[blank.id] = 'default';
+      initialUserAnswers[blank.id] = '';
+    });
+    
+    setBlankStatus(initialBlankStatus);
+    setUserAnswers(initialUserAnswers);
+  }, []);
+
+  // Handle user input for a blank
+  const handleInputChange = (blankId: string | number, value: string) => {
+    setUserAnswers(prev => ({
+      ...prev,
+      [blankId]: value
+    }));
+    
+    // If answers were already submitted, reset the submission state
+    if (isSubmitted) {
+      setIsSubmitted(false);
+      setScore(null);
+      
+      // Reset the blank status if previously submitted
+      setBlankStatus(prev => ({
+        ...prev,
+        [blankId]: 'default'
+      }));
+    }
+    
+    // Set the current blank as selected
+    setSelectedBlankId(blankId);
+  };
+
+  // Handle word selection from the word bank
+  const handleWordSelect = (word: string) => {
+    if (selectedBlankId !== null) {
+      handleInputChange(selectedBlankId, word);
+    }
+  };
+
+  // Check user answers against correct answers
+  const checkAnswers = () => {
+    let correctCount = 0;
+    const newBlankStatus: Record<string | number, 'correct' | 'incorrect' | 'default'> = {};
+    
+    quizData.blanks.forEach(blank => {
+      const isCorrect = userAnswers[blank.id]?.toLowerCase().trim() === blank.correct.toLowerCase();
+      newBlankStatus[blank.id] = isCorrect ? 'correct' : 'incorrect';
+      if (isCorrect) correctCount++;
+    });
+    
+    setBlankStatus(newBlankStatus);
+    setScore(Math.round((correctCount / quizData.blanks.length) * 100));
+    setIsSubmitted(true);
+    setIsRevealed(false);
+  };
+
+  // Reveal all correct answers
+  const revealAnswers = () => {
+    const revealedAnswers: Record<string | number, string> = {};
+    const allCorrectStatus: Record<string | number, 'correct' | 'incorrect' | 'default'> = {};
+    
+    quizData.blanks.forEach(blank => {
+      revealedAnswers[blank.id] = blank.correct;
+      allCorrectStatus[blank.id] = 'correct';
+    });
+    
+    setUserAnswers(revealedAnswers);
+    setBlankStatus(allCorrectStatus);
+    setIsRevealed(true);
+    setIsSubmitted(true);
+  };
+
+  // Play text-to-speech audio of the full text with correct answers
+  const playAudio = () => {
+    if (isSpeakingRef.current) return;
+    
+    isSpeakingRef.current = true;
+    
+    // Replace placeholders with correct answers to create the full text
+    let fullText = quizData.text;
+    quizData.blanks.forEach(blank => {
+      fullText = fullText.replace(blank.placeholder, blank.correct);
+    });
+    
+    const utterance = new SpeechSynthesisUtterance(fullText);
+    utterance.lang = 'en-US';
+    utterance.onend = () => {
+      isSpeakingRef.current = false;
+    };
+    
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // Reset the quiz
+  const resetQuiz = () => {
+    const initialUserAnswers: Record<string | number, string> = {};
+    const initialBlankStatus: Record<string | number, 'correct' | 'incorrect' | 'default'> = {};
+    
+    quizData.blanks.forEach(blank => {
+      initialUserAnswers[blank.id] = '';
+      initialBlankStatus[blank.id] = 'default';
+    });
+    
+    setUserAnswers(initialUserAnswers);
+    setBlankStatus(initialBlankStatus);
+    setIsSubmitted(false);
+    setScore(null);
+    setIsRevealed(false);
+    setSelectedBlankId(null);
+  };
+
+  // Render text with input fields for blanks
+  const renderTextWithBlanks = () => {
+    let result = [];
+    let lastIndex = 0;
+    
+    // Create a regex pattern to match all placeholders
+    const placeholderPattern = quizData.blanks.map(blank => blank.placeholder).join('|');
+    const regex = new RegExp(`(${placeholderPattern})`, 'g');
+    
+    // Map of placeholders to their corresponding blank IDs
+    const placeholderToBlankId: Record<string, string | number> = {};
+    quizData.blanks.forEach(blank => {
+      placeholderToBlankId[blank.placeholder] = blank.id;
+    });
+    
+    // Split the text by placeholders and insert input fields
+    const matches = quizData.text.matchAll(regex);
+    let i = 0;
+    
+    for (const match of matches) {
+      const placeholder = match[0];
+      const startIndex = match.index!;
+      const blankId = placeholderToBlankId[placeholder];
+      
+      // Add text before the placeholder
+      if (startIndex > lastIndex) {
+        result.push(
+          <span key={`text-${i}`}>
+            {quizData.text.substring(lastIndex, startIndex)}
+          </span>
+        );
+      }
+      
+      // Add the input field for the blank
+      const blankStatusClass = 
+        blankStatus[blankId] === 'correct' ? 'bg-green-100 text-green-600' :
+        blankStatus[blankId] === 'incorrect' ? 'bg-red-100 text-red-600' :
+        'bg-gray-100 text-gray-600';
+      
+      result.push(
+        <Input
+          key={`blank-${blankId}`}
+          className={`inline-block mx-1 px-2 py-1 rounded w-24 ${blankStatusClass}`}
+          value={userAnswers[blankId] || ''}
+          onChange={(e) => handleInputChange(blankId, e.target.value)}
+          onFocus={() => setSelectedBlankId(blankId)}
+          placeholder={placeholder}
+          disabled={isRevealed}
+        />
+      );
+      
+      lastIndex = startIndex + placeholder.length;
+      i++;
+    }
+    
+    // Add any remaining text after the last placeholder
+    if (lastIndex < quizData.text.length) {
+      result.push(
+        <span key={`text-final`}>
+          {quizData.text.substring(lastIndex)}
+        </span>
+      );
+    }
+    
+    return result;
+  };
+
+  return (
+    <div className="max-w-3xl mx-auto p-6 bg-white rounded-xl shadow-md min-h-screen flex flex-col items-center">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">Fill in the Blanks Exercise</h2>
+      
+      {/* Text with interactive blanks */}
+      <div className="text-lg text-gray-800 leading-relaxed mb-6">
+        {renderTextWithBlanks()}
+      </div>
+      
+      {/* Word bank */}
+      <div className="w-full">
+        <h3 className="text-lg font-semibold text-gray-700 mb-2">Word Bank</h3>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {quizData.wordBank.map((word, index) => (
+            <motion.button
+              key={index}
+              className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full cursor-pointer hover:bg-blue-200"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => handleWordSelect(word)}
+            >
+              {word}
+            </motion.button>
+          ))}
+        </div>
+      </div>
+      
+      {/* Controls */}
+      <div className="mt-6 flex gap-4">
+        <motion.button
+          className="px-6 py-2 bg-green-600 text-white rounded-full hover:bg-green-700"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={checkAnswers}
+        >
+          Check Answers
+        </motion.button>
+        
+        <motion.button
+          className="px-6 py-2 bg-purple-600 text-white rounded-full hover:bg-purple-700"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={revealAnswers}
+        >
+          Reveal Answers
+        </motion.button>
+        
+        <motion.button
+          className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 flex items-center gap-2"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={playAudio}
+        >
+          <Volume2 size={18} />
+          Listen
+        </motion.button>
+        
+        <motion.button
+          className="px-4 py-2 bg-gray-600 text-white rounded-full hover:bg-gray-700"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={resetQuiz}
+        >
+          Reset
+        </motion.button>
+      </div>
+      
+      {/* Feedback area */}
+      {isSubmitted && (
+        <div className="mt-6 text-center">
+          {score !== null && !isRevealed && (
+            <p className="text-xl font-semibold text-blue-600">
+              Your score: {score}%
+            </p>
+          )}
+          {isRevealed && (
+            <p className="text-xl font-semibold text-purple-600">
+              Answers Revealed
+            </p>
+          )}
+          {quizData.notes && (
+            <p className="text-base text-gray-500 italic mt-2">
+              Teaching Notes: {quizData.notes}
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default FillInBlankQuiz;
