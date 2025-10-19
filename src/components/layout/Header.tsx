@@ -31,11 +31,16 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
                 />
               </svg>
             </button>
-            <div className="flex items-center">
+            <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+              <img
+                src="/slim/assets/images/lnkd_profile_picture-01.jpg"
+                alt="SmartHub Tunis Logo"
+                className="h-12 w-12 rounded-full object-cover shadow-md border-2 border-orange-400"
+              />
               <span className="text-primary-600 text-2xl font-bold font-serif">
-                BeSmart Ezzahra
+                SmartHub Tunis
               </span>
-            </div>
+            </Link>
           </div>
 
           {/* Navigation for larger screens */}
@@ -75,12 +80,6 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
               className="text-gray-700 hover:text-primary-600 px-3 py-2 font-medium"
             >
               Listening
-            </Link>
-            <Link
-              to="/writing"
-              className="text-gray-700 hover:text-primary-600 px-3 py-2 font-medium"
-            >
-              Writing
             </Link>
             <Link
               to="/evaluation"

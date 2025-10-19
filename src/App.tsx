@@ -10,8 +10,8 @@ import QuizPage from './pages/QuizPage';
 import EvaluationPage from './pages/EvaluationPage';
 import ConfirmPageA1_2 from './pages/ConfirmPageA1-2';
 import ConfirmPageA1_3 from './pages/ConfirmPageA1-3';
-import WritingPage from './pages/WritingPage';
 import EFLCurriculumCarousel from './pages/EFLCurriculumCarousel';
+import PlanPage from './pages/PlanPage';
 import { AnimatePresence } from 'framer-motion';
 
 function App() {
@@ -29,8 +29,8 @@ function App() {
           <Route path="/evaluation" element={<EvaluationPage />} />
           <Route path="/confirm-a1-2" element={<ConfirmPageA1_2 />} />
           <Route path="/confirm-a1-3" element={<ConfirmPageA1_3 />} />
-          <Route path="/writing" element={<WritingPage />} />
           <Route path="/curriculum" element={<EFLCurriculumCarousel />} />
+          <Route path="/plan" element={<PlanPage />} />
         </Routes>
       </Layout>
     </AnimatePresence>

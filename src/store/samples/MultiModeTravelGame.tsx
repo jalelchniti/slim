@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, FC } from 'react';
 import { 
   Plane, 
   Map, 
@@ -20,8 +20,33 @@ import {
   HelpCircle 
 } from 'lucide-react';
 
-const TravelGame = () => {
-  const travelItems = [
+// Define interfaces for the data structures
+interface TravelItem {
+  id: string;
+  name: string;
+  icon: JSX.Element;
+  description: string;
+}
+
+interface CurrentQuestion {
+  type: string;
+  item: TravelItem;
+  correctAnswerId: string;
+}
+
+interface Feedback {
+  correct: boolean;
+  message: string;
+}
+
+interface GameMode {
+  id: string;
+  name: string;
+  description: string;
+}
+
+const TravelGame: FC = () => {
+  const travelItems: TravelItem[] = [
     { id: 'plane', name: 'Plane', icon: <Plane size={64} />, description: 'A vehicle that flies for long-distance travel.' },
     { id: 'car', name: 'Car', icon: <Car size={64} />, description: 'A road vehicle for personal transport.' },
     { id: 'ticket', name: 'Ticket', icon: <Tag size={64} />, description: 'A pass for using transport or entering a place.' },
@@ -39,20 +64,20 @@ const TravelGame = () => {
   const [gameMode, setGameMode] = useState('menu');
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
-  const [currentQuestion, setCurrentQuestion] = useState(null);
-  const [options, setOptions] = useState([]);
-  const [selectedOption, setSelectedOption] = useState(null);
-  const [feedback, setFeedback] = useState(null);
+  const [currentQuestion, setCurrentQuestion] = useState<CurrentQuestion | null>(null);
+  const [options, setOptions] = useState<TravelItem[]>([]);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [timer, setTimer] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
-  const [memoryCards, setMemoryCards] = useState([]);
-  const [flippedCards, setFlippedCards] = useState([]);
-  const [matchedCards, setMatchedCards] = useState([]);
+  const [memoryCards, setMemoryCards] = useState<TravelItem[]>([]);
+  const [flippedCards, setFlippedCards] = useState<string[]>([]);
+  const [matchedCards, setMatchedCards] = useState<string[]>([]);
   const [moves, setMoves] = useState(0);
 
   // Game modes
-  const gameModes = [
+  const gameModes: GameMode[] = [
     { id: 'identification', name: 'Travel Item Identification', description: 'Identify travel items from their descriptions' },
     { id: 'matching', name: 'Travel Item Matching', description: 'Match travel items with their correct names' },
     { id: 'memory', name: 'Travel Memory', description: 'Match pairs of travel items in a memory game' }
@@ -77,7 +102,7 @@ const TravelGame = () => {
     const randomItemIndex = Math.floor(Math.random() * travelItems.length);
     const correctItem = travelItems[randomItemIndex];
     
-    let incorrectOptions = [];
+    let incorrectOptions: TravelItem[] = [];
     const usedIndices = new Set([randomItemIndex]);
     
     while (incorrectOptions.length < 3) {
@@ -124,7 +149,7 @@ const TravelGame = () => {
     const randomItemIndex = Math.floor(Math.random() * travelItems.length);
     const correctItem = travelItems[randomItemIndex];
     
-    let incorrectOptions = [];
+    let incorrectOptions: Partial<TravelItem>[] = [];
     const usedIndices = new Set([randomItemIndex]);
     
     while (incorrectOptions.length < 3) {
@@ -138,7 +163,7 @@ const TravelGame = () => {
       }
     }
     
-    const allOptions = [
+    const allOptions: any = [
       { id: correctItem.id, description: correctItem.description },
       ...incorrectOptions
     ];
@@ -180,7 +205,7 @@ const TravelGame = () => {
   };
 
   // Handle card flip in memory game
-  const handleCardFlip = (cardId) => {
+  const handleCardFlip = (cardId: string) => {
     if (matchedCards.includes(cardId) || flippedCards.includes(cardId) || flippedCards.length >= 2) {
       return;
     }
@@ -214,9 +239,11 @@ const TravelGame = () => {
   };
 
   // Answer verification
-  const verifyAnswer = (selectedId) => {
+  const verifyAnswer = (selectedId: string) => {
     setSelectedOption(selectedId);
     
+    if (!currentQuestion) return;
+
     const isCorrect = selectedId === currentQuestion.correctAnswerId;
     
     setFeedback({
@@ -294,7 +321,7 @@ const TravelGame = () => {
         )}
         
         {/* Travel Item Identification Game */}
-        {gameMode === 'identification' && !gameOver && (
+        {gameMode === 'identification' && !gameOver && currentQuestion && (
           <div className="flex flex-col items-center">
             <div className="w-full flex justify-between items-center mb-6">
               <button onClick={resetGame} className="flex items-center text-blue-700">
@@ -307,7 +334,7 @@ const TravelGame = () => {
             
             <div className="w-full bg-blue-50 rounded-lg p-6 mb-6">
               <h2 className="text-xl font-semibold mb-4">What travel item matches this description?</h2>
-              <p className="text-lg italic mb-6 text-gray-700">"{currentQuestion?.item.description}"</p>
+              <p className="text-lg italic mb-6 text-gray-700">"{currentQuestion.item.description}"</p>
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {options.map((option) => (
@@ -341,7 +368,7 @@ const TravelGame = () => {
         )}
         
         {/* Travel Item Matching Game */}
-        {gameMode === 'matching' && !gameOver && (
+        {gameMode === 'matching' && !gameOver && currentQuestion && (
           <div className="flex flex-col items-center">
             <div className="w-full flex justify-between items-center mb-6">
               <button onClick={resetGame} className="flex items-center text-blue-700">
@@ -358,8 +385,8 @@ const TravelGame = () => {
                   <h2 className="text-xl font-semibold mb-4">Match the correct description for:</h2>
                   <div className="bg-white p-6 rounded-lg border-2 border-gray-300">
                     <div className="flex flex-col items-center">
-                      <div className="mb-2">{currentQuestion?.item.icon}</div>
-                      <span className="text-lg font-medium">{currentQuestion?.item.name}</span>
+                      <div className="mb-2">{currentQuestion.item.icon}</div>
+                      <span className="text-lg font-medium">{currentQuestion.item.name}</span>
                     </div>
                   </div>
                 </div>

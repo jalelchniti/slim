@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Volume2 } from 'lucide-react';
-import { Button } from '../../../../../components/ui/button';
+import { Button } from '@/components/ui/button';
 
 interface Flashcard {
   id: number | string;

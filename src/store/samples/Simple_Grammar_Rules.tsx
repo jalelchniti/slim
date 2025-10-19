@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '../../../components/ui/button';
+import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Volume2, RotateCcw } from 'lucide-react';
 
 // Define Flashcard interface

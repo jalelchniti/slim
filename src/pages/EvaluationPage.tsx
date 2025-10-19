@@ -1,8 +1,34 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+// Define interfaces for the question types
+interface McQuestion {
+  type: 'mc';
+  question: string;
+  options: string[];
+  answer: string;
+  sublevel: string;
+  curriculumUnit: number;
+  hiddenText?: string;
+  text?: string;
+}
+
+interface FillQuestion {
+  type: 'fill';
+  question: string;
+  answer: string;
+  sublevel: string;
+  curriculumUnit: number;
+  hiddenText?: string;
+  text?: string;
+}
+
+// Create a union type for the questions
+type Question = McQuestion | FillQuestion;
+
 const sections = ['grammar', 'vocabulary', 'listening', 'reading'];
-const questions = {
+
+const questions: { A1: { [key: string]: Question[] } } = {
   A1: {
     grammar: [
       { type: 'mc', question: 'I ___ happy.', options: ['am', 'is', 'are'], answer: 'am', sublevel: 'A1-1', curriculumUnit: 1 },
@@ -37,7 +63,6 @@ const questions = {
   },
 };
 
-// Rest of the file (A1PlacementEvaluationPage component) remains unchanged
 const A1PlacementEvaluationPage = () => {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<{ [key: string]: string }>({});
@@ -87,7 +112,7 @@ const A1PlacementEvaluationPage = () => {
     if (step > 0) setStep(step - 1);
   };
 
-  const renderQuestion = (section: string, q: any, index: number) => {
+  const renderQuestion = (section: string, q: Question, index: number) => {
     const key = `A1-${section}-${index}`;
     return (
       <div className="mb-4">
@@ -95,7 +120,7 @@ const A1PlacementEvaluationPage = () => {
         {q.hiddenText && (
           <div className="mb-2">
             <button
-              onClick={() => playTTS(q.hiddenText)}
+              onClick={() => playTTS(q.hiddenText!)}
               className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
             >
               Play Audio
@@ -106,7 +131,7 @@ const A1PlacementEvaluationPage = () => {
         {q.text && <p className="text-sm mb-2">{q.text}</p>}
         {q.type === 'mc' && (
           <div>
-            {q.options.map((opt: string) => (
+            {(q as McQuestion).options.map((opt: string) => (
               <label key={opt} className="block mb-1">
                 <input
                   type="radio"
@@ -185,7 +210,7 @@ const A1PlacementEvaluationPage = () => {
       {step < sections.length ? (
         <div>
           <h2 className="text-xl font-medium mb-4">{currentSection.charAt(0).toUpperCase() + currentSection.slice(1)}</h2>
-          {questions.A1[currentSection].map((q, i) => (
+          {questions.A1[currentSection].map((q: Question, i: number) => (
             <div key={i}>{renderQuestion(currentSection, q, i)}</div>
           ))}
           <div className="flex justify-between mt-4">

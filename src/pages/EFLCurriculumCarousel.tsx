@@ -3,304 +3,118 @@ import React, { useState, useMemo } from 'react';
 import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import { motion } from 'framer-motion';
-import { FaSearch, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { FaSearch, FaChevronLeft, FaChevronRight, FaCalendar, FaClock } from 'react-icons/fa';
 
 const courseSchedule = [
   {
-    month: 'Month 1',
-    weeks: [
+    week: 'Week 1',
+    theme: 'Foundation & Self-Introduction',
+    duration: 'October 14-18, 2025',
+    sessions: [
       {
-        week: 'Week 1',
-        lessons: [
-          {
-            unit: 'Hello!',
-            objectives: 'Learn greetings and introductions; use "am/are/is".',
-            grammar: 'am/are/is, my/your, What’s your name?, This is ..., Nice to meet you.',
-            vocabulary: 'How are you?, Numbers 1-20, Countries',
-            tasks: 'Practice greetings (sp_01-01); Vocabulary flashcards (vo_01-01).',
-            quizId: 'sp_01-01',
-            flashcardId: 'vo_01-01',
-            everydayEnglish: 'Good morning!, See you later!',
-          },
-          {
-            unit: 'Hello!',
-            objectives: 'Ask and answer simple questions; introduce others.',
-            grammar: 'What’s your name?, This is ...',
-            vocabulary: 'Nice to meet you, Very well, thank you.',
-            tasks: 'Roleplay introductions; Quiz on greetings (vo_01-02).',
-            quizId: 'vo_01-02',
-            everydayEnglish: 'Have a nice day., Goodbye!',
-          },
-        ],
+        session: 'Session 1',
+        date: 'Tuesday, October 14, 2025',
+        time: '11:00-12:30',
+        objective: 'Establish baseline communication skills and build rapport',
+        content: 'Ice-breaking activities, assessing current English level through guided conversation, introducing survival phrases for daily interactions (greetings, basic questions, expressing needs), pronunciation fundamentals for American English, setting personal learning goals for USA transition',
       },
       {
-        week: 'Week 2',
-        lessons: [
-          {
-            unit: 'Your world',
-            objectives: 'Talk about countries and people; use "he/she/they".',
-            grammar: 'he/she/they, he/her, He’s from the United States.',
-            vocabulary: 'Countries (Brazil, China), Adjectives (beautiful)',
-            tasks: 'Reading about people (re_01-01); Vocabulary quiz (vo_01-02).',
-            quizId: 're_01-01',
-            everydayEnglish: 'fifteen, twenty-one',
-          },
-          {
-            unit: 'Your world',
-            objectives: 'Ask questions about people; describe places.',
-            grammar: 'Questions: What’s his name?, Where’s she from?',
-            vocabulary: 'Nouns: centre, hospital, park',
-            tasks: 'Speaking practice; Flashcards for places (vo_01-03).',
-            flashcardId: 'vo_01-03',
-            everydayEnglish: 'fifteen, twenty-one',
-          },
-        ],
+        session: 'Session 2',
+        date: 'Thursday, October 16, 2025',
+        time: '11:00-12:30',
+        objective: 'Develop self-presentation skills for American contexts',
+        content: 'Talking about yourself (name, age, background, interests), discussing Tunisia and your hometown with Americans, explaining your educational background positively, expressing future plans and reasons for moving to USA, practicing active listening and response strategies',
       },
       {
-        week: 'Week 3',
-        lessons: [
-          {
-            unit: 'All about you',
-            objectives: 'Describe jobs and personal information; use "am/are/is".',
-            grammar: 'am/are/is, We’re all singers., She isn’t a nurse.',
-            vocabulary: 'Jobs (police officer, nurse), Personal information',
-            tasks: 'Reading quiz (re_01-01); Grammar quiz (gr_01-01).',
-            quizId: 're_01-01',
-            secondaryQuizId: 'gr_01-01',
-            everydayEnglish: 'I’m sorry., Excuse me!',
-          },
-          {
-            unit: 'All about you',
-            objectives: 'Ask yes/no questions; give short answers.',
-            grammar: 'Questions: Is she married?, Short answers: Yes, she is.',
-            vocabulary: 'surname, address, phone number',
-            tasks: 'Grammar flashcards (gr_01-04); Yes/no quiz (gr_01-03).',
-            quizId: 'gr_01-03',
-            flashcardId: 'gr_01-04',
-            everydayEnglish: 'I don’t understand.',
-          },
-        ],
-      },
-      {
-        week: 'Week 4',
-        lessons: [
-          {
-            unit: 'Family and friends',
-            objectives: 'Talk about family; use possessive adjectives.',
-            grammar: 'Possessive adjectives: her, their, Anna’s husband',
-            vocabulary: 'The family: son, wife, very beautiful',
-            tasks: 'Writing practice (wr_01-01); Reading about friends.',
-            quizId: 'wr_01-01',
-            everydayEnglish: 'How do you spell ...?, On the phone',
-          },
-          {
-            unit: 'The way I live',
-            objectives: 'Describe daily activities; use Present Simple.',
-            grammar: 'Present Simple: I/you/he, Like ice-cream?',
-            vocabulary: 'Sports (tennis), Food (hamburger), Languages',
-            tasks: 'Listening quiz (li_01-01); Vocabulary flashcards (vo_01-03).',
-            quizId: 'li_01-01',
-            flashcardId: 'vo_01-03',
-            everydayEnglish: 'How much is it?, £6.50',
-          },
-        ],
+        session: 'Session 3',
+        date: 'Saturday, October 18, 2025',
+        time: '11:00-12:30',
+        objective: 'Master essential question formation and information gathering',
+        content: 'Asking for and giving directions, inquiring about prices and services, requesting clarification when you don\'t understand, telephone basics (making appointments, leaving messages), role-play: arriving in an American city for the first time',
       },
     ],
   },
   {
-    month: 'Month 2',
-    weeks: [
+    week: 'Week 2',
+    theme: 'Daily Life Survival Skills',
+    duration: 'October 21-25, 2025',
+    sessions: [
       {
-        week: 'Week 1',
-        lessons: [
-          {
-            unit: 'Every day',
-            objectives: 'Talk about routines; use Present Simple for "he/she".',
-            grammar: 'Present Simple: He gets up at 6.00., Adverbs: always, often',
-            vocabulary: 'The time: nine o’clock, Verbs: get home, Nouns: coffee',
-            tasks: 'Speaking lifestyle questions; Grammar quiz (gr_01-01).',
-            quizId: 'gr_01-01',
-            everydayEnglish: 'Days of the week, on Sunday',
-          },
-          {
-            unit: 'Every day',
-            objectives: 'Tell time; use prepositions of time.',
-            grammar: 'What time does he have breakfast?',
-            vocabulary: 'It’s ten fifteen., toast, beach',
-            tasks: 'Vocabulary flashcards (vo_01-04); Roleplay telling time.',
-            flashcardId: 'vo_01-04',
-            everydayEnglish: 'at nine o’clock, in the morning',
-          },
-        ],
+        session: 'Session 4',
+        date: 'Tuesday, October 21, 2025',
+        time: '11:00-12:30',
+        objective: 'Navigate shopping and consumer transactions',
+        content: 'Grocery shopping vocabulary and interactions, understanding American measurements and currency, ordering food at restaurants and fast-food chains, handling returns and exchanges, dealing with cashiers and service workers',
       },
       {
-        week: 'Week 2',
-        lessons: [
-          {
-            unit: 'My favourites',
-            objectives: 'Describe preferences; use question words.',
-            grammar: 'Question words: who, what, this/that',
-            vocabulary: 'Adjectives: comfortable, friendly, Places: chemist',
-            tasks: 'Writing a postcard; Reading quiz (re_01-02).',
-            quizId: 're_01-02',
-            everydayEnglish: 'Can I have a return ticket?',
-          },
-          {
-            unit: 'My favourites',
-            objectives: 'Use opposite adjectives; talk about places.',
-            grammar: 'Pronouns: subject/Object, these/those',
-            vocabulary: 'Opposite adjectives: new/old, big/small',
-            tasks: 'Vocabulary flashcards (vo_01-03); Speaking practice.',
-            flashcardId: 'vo_01-03',
-            everydayEnglish: 'Can I try on this jumper, please?',
-          },
-        ],
+        session: 'Session 5',
+        date: 'Thursday, October 23, 2025',
+        time: '11:00-12:30',
+        objective: 'Manage housing and neighborhood integration',
+        content: 'Apartment hunting conversations, talking with landlords and roommates, describing housing problems and requesting repairs, introducing yourself to neighbors, understanding lease agreements through conversation',
       },
       {
-        week: 'Week 3',
-        lessons: [
-          {
-            unit: 'Where I live',
-            objectives: 'Describe places; use "There is/are".',
-            grammar: 'There is/are ... old offices, Are there any animals?',
-            vocabulary: 'Rooms: living room, bedroom, In town: post office',
-            tasks: 'Reading about cities; Writing quiz (wr_01-01).',
-            quizId: 'wr_01-01',
-            everydayEnglish: 'Turn left ..., Go straight on ...',
-          },
-          {
-            unit: 'Where I live',
-            objectives: 'Use prepositions; describe locations.',
-            grammar: 'Prepositions: in, on, under, next to',
-            vocabulary: 'furniture: sofa, beach, ferry',
-            tasks: 'Vocabulary flashcards (vo_01-04); Speaking directions.',
-            flashcardId: 'vo_01-04',
-            everydayEnglish: 'Is there a ... near here?',
-          },
-        ],
-      },
-      {
-        week: 'Week 4',
-        lessons: [
-          {
-            unit: 'Times past',
-            objectives: 'Talk about the past; use "was/were".',
-            grammar: 'was/were born, I was born in 1996.',
-            vocabulary: 'Years: 2002, 1996, People: singer, artist',
-            tasks: 'Listening quiz (li_01-01); Reading about history.',
-            quizId: 'li_01-01',
-            everydayEnglish: 'What’s your birthday?, January',
-          },
-          {
-            unit: 'We had a great time!',
-            objectives: 'Use Past Simple; describe past activities.',
-            grammar: 'Past Simple: Played, got, What did you do?',
-            vocabulary: 'Weekend activities: go to the cinema, Sports: skiing',
-            tasks: 'Writing a postcard; Reading quiz (re_01-02).',
-            quizId: 're_01-02',
-            everydayEnglish: 'Really? Oh! Good!',
-          },
-        ],
+        session: 'Session 6',
+        date: 'Saturday, October 25, 2025',
+        time: '11:00-12:30',
+        objective: 'Access essential services and transportation',
+        content: 'Using public transportation (asking for help, reading schedules), visiting the doctor or pharmacy, banking basics (opening accounts, understanding services), emergency situations vocabulary, calling for help when needed',
       },
     ],
   },
   {
-    month: 'Month 3',
-    weeks: [
+    week: 'Week 3',
+    theme: 'Social Integration & Cultural Fluency',
+    duration: 'October 28 - November 1, 2025',
+    sessions: [
       {
-        week: 'Week 1',
-        lessons: [
-          {
-            unit: 'I can do that!',
-            objectives: 'Talk about abilities; use "can/can’t".',
-            grammar: 'can’t, Mr can speak French., Can she run fast?',
-            vocabulary: 'Verbs: run, drive, Adjectives: fast, dangerous',
-            tasks: 'Reading about the Internet; Grammar quiz (gr_01-03).',
-            quizId: 'gr_01-03',
-            everydayEnglish: 'I’m lost!, Turn everything off.',
-          },
-          {
-            unit: 'I can do that!',
-            objectives: 'Make requests; use adverbs.',
-            grammar: 'Adverbs: really well, quietly, Can I help you?',
-            vocabulary: 'Verb + noun: listen to the radio, chat to friends',
-            tasks: 'Speaking roleplay; Flashcards (vo_01-03).',
-            flashcardId: 'vo_01-03',
-            everydayEnglish: 'This machine doesn’t work!',
-          },
-        ],
+        session: 'Session 7',
+        date: 'Tuesday, October 28, 2025',
+        time: '11:00-12:30',
+        objective: 'Build social connections and friendships',
+        content: 'Making small talk with Americans (weather, sports, current events), expressing opinions and preferences, accepting and declining invitations politely, sharing about Tunisian culture, understanding American social cues and conversation norms',
       },
       {
-        week: 'Week 2',
-        lessons: [
-          {
-            unit: 'Please and thank you',
-            objectives: 'Shop for items; use "I’d like ...".',
-            grammar: 'I’d like ..., some and any, Do you have any bread?',
-            vocabulary: 'Shopping: bread, milk, In a restaurant: soup, salad',
-            tasks: 'Listening quiz (li_01-01); Roleplay ordering food.',
-            quizId: 'li_01-01',
-            everydayEnglish: 'Would you like a drink?',
-          },
-          {
-            unit: 'Please and thank you',
-            objectives: 'Order in a restaurant; use "like/would like".',
-            grammar: 'like and would like, I like Coke.',
-            vocabulary: 'food: cereal, pasta, fish',
-            tasks: 'Speaking practice; Vocabulary flashcards (vo_01-04).',
-            flashcardId: 'vo_01-04',
-            everydayEnglish: 'What would you like to watch the football?',
-          },
-        ],
+        session: 'Session 8',
+        date: 'Thursday, October 30, 2025',
+        time: '11:00-12:30',
+        objective: 'Navigate educational and professional environments',
+        content: 'Discussing educational options (GED, community college, vocational training), job interview basics, talking about work experience and skills, understanding workplace conversation, networking and professional introductions',
       },
       {
-        week: 'Week 3',
-        lessons: [
-          {
-            unit: 'Here and now',
-            objectives: 'Describe current actions; use Present Continuous.',
-            grammar: 'Present Continuous, What’s he doing?',
-            vocabulary: 'Colours: red, green, Clothes: jacket, trousers',
-            tasks: 'Reading quiz (re_01-02); Speaking conversations.',
-            quizId: 're_01-02',
-            everydayEnglish: 'What’s the matter?, She has a headache.',
-          },
-          {
-            unit: 'Here and now',
-            objectives: 'Compare Present Simple and Continuous.',
-            grammar: 'Present Simple and Present Continuous',
-            vocabulary: 'Opposite verbs: buy/sell, hate/love',
-            tasks: 'Grammar flashcards (gr_01-04); Grammar quiz (gr_01-01).',
-            quizId: 'gr_01-01',
-            flashcardId: 'gr_01-04',
-            everydayEnglish: 'Why don’t you ...?, That’s a good idea.',
-          },
-        ],
+        session: 'Session 9',
+        date: 'Saturday, November 1, 2025',
+        time: '11:00-12:30',
+        objective: 'Handle conflicts and problem-solving situations',
+        content: 'Making complaints appropriately, disagreeing politely, negotiating solutions, apologizing and accepting apologies, dealing with misunderstandings, asserting yourself respectfully in American contexts',
+      },
+    ],
+  },
+  {
+    week: 'Week 4',
+    theme: 'Advanced Conversation & Real-World Scenarios',
+    duration: 'November 4-8, 2025',
+    sessions: [
+      {
+        session: 'Session 10',
+        date: 'Tuesday, November 4, 2025',
+        time: '11:00-12:30',
+        objective: 'Develop storytelling and extended speaking skills',
+        content: 'Narrating personal experiences, describing past events in Tunisia, talking about future goals and dreams, using transitions to connect ideas, maintaining longer conversations without awkward silences',
       },
       {
-        week: 'Week 4',
-        lessons: [
-          {
-            unit: 'It’s time to go!',
-            objectives: 'Talk about future plans; use "going to".',
-            grammar: 'Future plans: I’m leaving on Tuesday.',
-            vocabulary: 'Transport: bus, plane, Words: train station',
-            tasks: 'Writing a postcard; Reading quiz (re_01-01).',
-            quizId: 're_01-01',
-            everydayEnglish: 'Don’t worry!, It doesn’t matter!',
-          },
-          {
-            unit: 'Review',
-            objectives: 'Review key grammar and vocabulary; assess progress.',
-            grammar: 'Mix of am/are/is, Present Simple, Past Simple, can',
-            vocabulary: 'Greetings, jobs, daily routines, shopping',
-            tasks: 'Mixed quiz (gr_01-03); Speaking roleplay (sp_01-01).',
-            quizId: 'gr_01-03',
-            secondaryQuizId: 'sp_01-01',
-            everydayEnglish: 'Thanks for everything!, It was a pleasure.',
-          },
-        ],
+        session: 'Session 11',
+        date: 'Thursday, November 6, 2025',
+        time: '11:00-12:30',
+        objective: 'Master practical communication strategies',
+        content: 'Using technology and apps in English (ordering Uber, using GPS, online shopping), understanding different American accents and speaking speeds, idiomatic expressions for everyday situations, slang awareness without overuse',
+      },
+      {
+        session: 'Session 12',
+        date: 'Saturday, November 8, 2025',
+        time: '11:00-12:30',
+        objective: 'Consolidate learning and prepare for independent communication',
+        content: 'Comprehensive role-play scenarios combining all learned skills, troubleshooting common communication breakdowns, building confidence through simulated real-life situations, creating personal action plan for continued English improvement in USA, celebration of progress and final assessment',
       },
     ],
   },
@@ -310,52 +124,44 @@ const EFLCurriculumCarousel = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
 
-  // Flatten lessons for filtering
-  const allLessons = useMemo(() => {
-    return courseSchedule.flatMap(month =>
-      month.weeks.flatMap(week =>
-        week.lessons.map(lesson => ({
-          ...lesson,
-          month: month.month,
-          week: week.week,
-        }))
-      )
+  // Flatten sessions for filtering
+  const allSessions = useMemo(() => {
+    return courseSchedule.flatMap(week =>
+      week.sessions.map(session => ({
+        ...session,
+        week: week.week,
+        theme: week.theme,
+        duration: week.duration,
+      }))
     );
   }, []);
 
-  // Filter lessons based on search query and selected filter
-  const filteredLessons = useMemo(() => {
-    let lessons = allLessons;
+  // Filter sessions based on search query and selected filter
+  const filteredSessions = useMemo(() => {
+    let sessions = allSessions;
 
-    // Apply month/week filter
+    // Apply week filter
     if (selectedFilter !== 'All') {
-      if (selectedFilter.includes('Month')) {
-        lessons = lessons.filter(lesson => lesson.month === selectedFilter);
-      } else {
-        lessons = lessons.filter(lesson => lesson.week === selectedFilter);
-      }
+      sessions = sessions.filter(session => session.week === selectedFilter);
     }
 
     // Apply search query
     if (searchQuery) {
-      lessons = lessons.filter(lesson =>
-        lesson.unit.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        lesson.objectives.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        lesson.grammar.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        lesson.vocabulary.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        lesson.tasks.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        lesson.everydayEnglish.toLowerCase().includes(searchQuery.toLowerCase())
+      sessions = sessions.filter(session =>
+        session.session.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        session.objective.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        session.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        session.theme.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
-    return lessons;
-  }, [searchQuery, selectedFilter, allLessons]);
+    return sessions;
+  }, [searchQuery, selectedFilter, allSessions]);
 
   // Options for filter dropdown
   const filterOptions = [
     'All',
-    ...courseSchedule.map(month => month.month),
-    ...courseSchedule.flatMap(month => month.weeks.map(week => week.week)),
+    ...courseSchedule.map(week => week.week),
   ];
 
   // Disable autoPlay when searching or filtering
@@ -364,14 +170,20 @@ const EFLCurriculumCarousel = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-indigo-800 mb-6 text-center">EFL Course Schedule</h1>
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-indigo-800 mb-2">Conversational English Course</h1>
+          <h2 className="text-2xl font-semibold text-indigo-600 mb-2">Student: Slim Gharbi</h2>
+          <p className="text-lg text-gray-700">Duration: 18 Hours | October 14 - November 8, 2025</p>
+          <p className="text-md text-gray-600 mt-2">Preparing for USA Transition</p>
+        </div>
 
         {/* Search Bar and Filter */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="relative flex-grow">
             <input
               type="text"
-              placeholder="Search lessons, grammar, vocabulary..."
+              placeholder="Search sessions, objectives, content..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full p-4 pl-12 rounded-lg shadow-lg border-2 border-indigo-200 focus:outline-none focus:border-indigo-500"
@@ -394,25 +206,25 @@ const EFLCurriculumCarousel = () => {
         </div>
 
         {/* Display message if no results */}
-        {filteredLessons.length === 0 ? (
+        {filteredSessions.length === 0 ? (
           <div className="text-center text-gray-600 text-lg">
             No results found for "{searchQuery}". Try a different search term or filter.
           </div>
         ) : (
           <Carousel
-            key={filteredLessons.length}
+            key={filteredSessions.length}
             showArrows={true}
             showThumbs={false}
             infiniteLoop={true}
             autoPlay={shouldAutoPlay}
-            interval={5000}
+            interval={6000}
             stopOnHover={true}
             renderArrowPrev={(onClickHandler, hasPrev, label) =>
               hasPrev && (
                 <button
                   onClick={onClickHandler}
                   title={label}
-                  className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-indigo-600 text-white p-2 rounded-full hover:bg-indigo-700 transition-colors z-10"
+                  className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-indigo-600 text-white p-3 rounded-full hover:bg-indigo-700 transition-colors z-10 shadow-lg"
                 >
                   <FaChevronLeft />
                 </button>
@@ -423,73 +235,84 @@ const EFLCurriculumCarousel = () => {
                 <button
                   onClick={onClickHandler}
                   title={label}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-indigo-600 text-white p-2 rounded-full hover:bg-indigo-700 transition-colors z-10"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-indigo-600 text-white p-3 rounded-full hover:bg-indigo-700 transition-colors z-10 shadow-lg"
                 >
                   <FaChevronRight />
                 </button>
               )
             }
           >
-            {filteredLessons.map((lesson, index) => (
+            {filteredSessions.map((session, index) => (
               <motion.div
-                key={`${lesson.month}-${lesson.week}-${index}`}
-                className="p-6 bg-white rounded-lg shadow-xl mx-4"
+                key={`${session.week}-${session.session}-${index}`}
+                className="p-8 bg-white rounded-xl shadow-2xl mx-4 mb-8"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.5 }}
               >
-                <h2 className="text-2xl font-semibold mb-4">
-                  <span className="text-indigo-600">{lesson.month}</span> | <span className="text-teal-600">{lesson.week}</span> | <span className="text-purple-600">Lesson {index + 1} : {lesson.unit}</span>
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <h3 className="text-lg font-medium text-indigo-600 mb-2">Objectives</h3>
-                    <p className="text-gray-700">{lesson.objectives}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-medium text-indigo-600 mb-2">Grammar</h3>
-                    <p className="text-gray-700">{lesson.grammar}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-medium text-indigo-600 mb-2">Vocabulary</h3>
-                    <p className="text-gray-700">{lesson.vocabulary}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-medium text-indigo-600 mb-2">Tasks</h3>
-                    <p className="text-gray-700">{lesson.tasks}</p>
-                    <div className="flex gap-2 mt-2">
-                      {lesson.quizId && (
-                        <Link
-                          to={`/quiz/${lesson.quizId}`}
-                          className="text-sm text-indigo-600 hover:underline"
-                        >
-                          Take Quiz
-                        </Link>
-                      )}
-                      {lesson.flashcardId && (
-                        <Link
-                          to={`/quiz/${lesson.flashcardId}`}
-                          className="text-sm text-green-600 hover:underline"
-                        >
-                          Flashcards
-                        </Link>
-                      )}
-                      {lesson.secondaryQuizId && (
-                        <Link
-                          to={`/quiz/${lesson.secondaryQuizId}`}
-                          className="text-sm text-blue-600 hover:underline"
-                        >
-                          Extra Quiz
-                        </Link>
-                      )}
+                {/* Session Header */}
+                <div className="mb-6 border-b-2 border-indigo-100 pb-4">
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-3">
+                    <h2 className="text-3xl font-bold text-indigo-700">
+                      {session.session}
+                    </h2>
+                    <div className="flex gap-2 mt-2 md:mt-0">
+                      <span className="inline-block bg-teal-100 text-teal-800 text-sm font-semibold px-4 py-1 rounded-full">
+                        {session.week}
+                      </span>
                     </div>
                   </div>
-                  <div>
-                    <h3 className="text-lg font-medium text-indigo-600 mb-2">Everyday English</h3>
-                    <p className="text-gray-700">{lesson.everydayEnglish}</p>
+                  <h3 className="text-xl font-semibold text-purple-600 mb-2">
+                    {session.theme}
+                  </h3>
+                  <div className="flex flex-col sm:flex-row gap-4 text-gray-600">
+                    <div className="flex items-center gap-2">
+                      <FaCalendar className="text-indigo-500" />
+                      <span className="text-sm">{session.date}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FaClock className="text-indigo-500" />
+                      <span className="text-sm">{session.time}</span>
+                    </div>
                   </div>
                 </div>
+
+                {/* Session Content */}
+                <div className="space-y-6">
+                  <div className="bg-indigo-50 p-6 rounded-lg">
+                    <h4 className="text-lg font-bold text-indigo-700 mb-3 flex items-center gap-2">
+                      <span className="text-2xl">🎯</span>
+                      Session Objective
+                    </h4>
+                    <p className="text-gray-800 text-lg leading-relaxed">
+                      {session.objective}
+                    </p>
+                  </div>
+
+                  <div className="bg-blue-50 p-6 rounded-lg">
+                    <h4 className="text-lg font-bold text-blue-700 mb-3 flex items-center gap-2">
+                      <span className="text-2xl">📋</span>
+                      Content & Activities
+                    </h4>
+                    <p className="text-gray-800 leading-relaxed">
+                      {session.content}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Session Methodology Note */}
+                {index === 0 && (
+                  <div className="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
+                    <h5 className="font-semibold text-yellow-800 mb-2">📝 Session Structure (90 minutes)</h5>
+                    <ul className="text-sm text-yellow-900 space-y-1">
+                      <li>• Warm-up (10 min): Review & conversational practice</li>
+                      <li>• Core Learning (50 min): Interactive activities & role-plays</li>
+                      <li>• Real-World Application (20 min): USA situation scenarios</li>
+                      <li>• Wrap-up (10 min): Self-assessment & preview</li>
+                    </ul>
+                  </div>
+                )}
               </motion.div>
             ))}
           </Carousel>

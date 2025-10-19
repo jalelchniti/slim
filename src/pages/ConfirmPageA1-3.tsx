@@ -1,8 +1,34 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+// Define interfaces for the question types
+interface McQuestion {
+  type: 'mc';
+  question: string;
+  options: string[];
+  answer: string;
+  sublevel: string;
+  curriculumUnit: number;
+  hiddenText?: string;
+  text?: string;
+}
+
+interface FillQuestion {
+  type: 'fill';
+  question: string;
+  answer: string;
+  sublevel: string;
+  curriculumUnit: number;
+  hiddenText?: string;
+  text?: string;
+}
+
+// Create a union type for the questions
+type Question = McQuestion | FillQuestion;
+
 const sections = ['grammar', 'vocabulary', 'listening', 'reading'];
-const questions = {
+
+const questions: { A1_3: { [key: string]: Question[] } } = {
   A1_3: {
     grammar: [
       { type: 'mc', question: 'They ___ (never/go) to the cinema.', options: ['never go', 'go never', 'never goes'], answer: 'never go', sublevel: 'A1-3', curriculumUnit: 6 },
@@ -76,7 +102,7 @@ const ConfirmA1_3Page = () => {
     if (step > 0) setStep(step - 1);
   };
 
-  const renderQuestion = (section: string, q: any, index: number) => {
+  const renderQuestion = (section: string, q: Question, index: number) => {
     const key = `A1_3-${section}-${index}`;
     return (
       <div className="mb-4">
@@ -84,7 +110,7 @@ const ConfirmA1_3Page = () => {
         {q.hiddenText && (
           <div className="mb-2">
             <button
-              onClick={() => playTTS(q.hiddenText)}
+              onClick={() => playTTS(q.hiddenText!)}
               className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
             >
               Play Audio
@@ -95,7 +121,7 @@ const ConfirmA1_3Page = () => {
         {q.text && <p className="text-sm mb-2">{q.text}</p>}
         {q.type === 'mc' && (
           <div>
-            {q.options.map((opt: string) => (
+            {(q as McQuestion).options.map((opt: string) => (
               <label key={opt} className="block mb-1">
                 <input
                   type="radio"
@@ -163,7 +189,7 @@ const ConfirmA1_3Page = () => {
       {step < sections.length ? (
         <div>
           <h2 className="text-xl font-medium mb-4">{currentSection.charAt(0).toUpperCase() + currentSection.slice(1)}</h2>
-          {questions.A1_3[currentSection].map((q, i) => (
+          {questions.A1_3[currentSection].map((q: Question, i: number) => (
             <div key={i}>{renderQuestion(currentSection, q, i)}</div>
           ))}
           <div className="flex justify-between mt-4">

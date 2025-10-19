@@ -4,26 +4,29 @@ import { Link } from 'react-router-dom';
 const HomePage = () => {
   return (
     <div className="space-y-10">
-      {/* Hero Section */}
-      <section 
-        className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary-600 to-primary-800 text-white h-64 sm:h-80 md:h-96 lg:h-[28rem] bg-cover bg-center"
-        style={{ backgroundImage: `url('/assets/images/banner.jpg')` }}
+      {/* Hero Section - SmartHub Banner */}
+      <section
+        className="relative overflow-hidden rounded-2xl text-white h-64 sm:h-80 md:h-96 lg:h-[28rem] bg-cover bg-center shadow-xl"
+        style={{ backgroundImage: `url('/slim/assets/images/fb_cover-01.png')` }}
       >
-        <div className="absolute inset-0 opacity-10">
-          <svg className="h-full w-full" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="pattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-                <path d="M0 20h40v1H0z" />
-                <path d="M20 0v40h1V0z" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#pattern)" />
-          </svg>
-        </div>
-        
-        <div className="relative h-full flex items-center px-6 sm:px-10 md:px-16">
-          <div className="max-w-2xl">
-          </div>
+        {/* Optional subtle gradient overlay for depth */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20"></div>
+
+        {/* Content area - can be used for call-to-action buttons if needed */}
+        <div className="relative h-full flex items-end justify-center pb-8 px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="flex gap-4"
+          >
+            <Link to="/vocabulary" className="btn bg-orange-500 hover:bg-orange-600 text-white shadow-lg">
+              Start Learning
+            </Link>
+            <Link to="/curriculum" className="btn bg-white/90 hover:bg-white text-gray-800 shadow-lg">
+              View Curriculum
+            </Link>
+          </motion.div>
         </div>
       </section>
       
@@ -73,10 +76,10 @@ const HomePage = () => {
             <h2 className="text-2xl md:text-3xl font-bold mb-4">Essential Verb Forms (A1)</h2>
             <p className="text-gray-700 mb-6">Master the verb "to be" with interactive quizzes and flashcards designed for beginners.</p>
             <div className="flex gap-4">
-              <Link to="/quiz/02-01-01" className="btn btn-primary">
+              <Link to="/quiz/gr_01-01" className="btn btn-primary">
                 Take Quiz
               </Link>
-              <Link to="/quiz/02-01-02" className="btn bg-green-100 text-green-800 hover:bg-green-200">
+              <Link to="/quiz/gr_01-02" className="btn bg-green-100 text-green-800 hover:bg-green-200">
                 View Flashcards
               </Link>
             </div>
@@ -143,14 +146,6 @@ const categories = [
     icon: "🎧",
     iconBg: "bg-pink-100",
     iconColor: "text-pink-600"
-  },
-  {
-    title: "Writing",
-    description: "Learn to construct simple sentences",
-    path: "/writing",
-    icon: "✍️",
-    iconBg: "bg-indigo-100",
-    iconColor: "text-indigo-600"
   }
 ];
 

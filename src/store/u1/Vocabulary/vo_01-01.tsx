@@ -3,18 +3,18 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 
 const flashcards = [
-  { sideA: "Hello! My name's Jane.", sideB: "Nice to meet you, Jane. My name's ..." },
-  { sideA: "Goodbye.", sideB: "Goodbye. Have a nice day." },
-  { sideA: "Good night.", sideB: "Good night. See you tomorrow." },
-  { sideA: "1", sideB: "One" },
-  { sideA: "2", sideB: "Two" },
-  { sideA: "3", sideB: "Three" },
-  { sideA: "4", sideB: "Four" },
-  { sideA: "8", sideB: "Eight" },
-  { sideA: "9", sideB: "Nine" },
-  { sideA: "10", sideB: "Ten" },
-  { sideA: "11", sideB: "Eleven" },
-  { sideA: "12", sideB: "Twelve" },
+  { sideA: "Hello! How are you?", sideB: "Hi! I'm fine, thank you. And you?" },
+  { sideA: "Can you help me, please?", sideB: "Sure! What do you need?" },
+  { sideA: "Where is the bathroom?", sideB: "It's down the hall, on your left." },
+  { sideA: "I don't understand.", sideB: "Could you repeat that, please?" },
+  { sideA: "Excuse me, where is...?", sideB: "Go straight and turn right." },
+  { sideA: "How much does this cost?", sideB: "That's five dollars." },
+  { sideA: "Thank you very much!", sideB: "You're welcome!" },
+  { sideA: "I'm sorry, I'm new here.", sideB: "No problem! Let me help you." },
+  { sideA: "Can I have..., please?", sideB: "Of course! Here you go." },
+  { sideA: "What time is it?", sideB: "It's three o'clock." },
+  { sideA: "See you later!", sideB: "See you! Have a great day!" },
+  { sideA: "I need help with...", sideB: "I can help you with that." },
 ];
 
 const FlashcardQuiz: React.FC = () => {
@@ -56,21 +56,16 @@ const FlashcardQuiz: React.FC = () => {
     window.speechSynthesis.speak(utterance);
   };
 
-  // Handle flip with conditional TTS
+  // Handle flip with TTS for both sides
   const handleFlip = () => {
     const newFlipped = !isFlipped;
     setIsFlipped(newFlipped);
 
-    if (currentCard < 3) {
-      // Cards 1-3: TTS on Side A when flipping to front
-      if (!newFlipped) {
-        speak(flashcards[currentCard].sideA);
-      }
+    // Speak Side A when showing front, Side B when showing back
+    if (!newFlipped) {
+      speak(flashcards[currentCard].sideA);
     } else {
-      // Cards 4-12: TTS on Side B when flipping to back
-      if (newFlipped) {
-        speak(flashcards[currentCard].sideB);
-      }
+      speak(flashcards[currentCard].sideB);
     }
   };
 
@@ -79,10 +74,8 @@ const FlashcardQuiz: React.FC = () => {
     const newCard = (currentCard + 1) % flashcards.length;
     setCurrentCard(newCard);
 
-    // Speak Side A for Cards 1-3 only
-    if (newCard < 3) {
-      speak(flashcards[newCard].sideA);
-    }
+    // Speak Side A when moving to new card
+    speak(flashcards[newCard].sideA);
   };
 
   const handlePrev = () => {
@@ -90,24 +83,16 @@ const FlashcardQuiz: React.FC = () => {
     const newCard = (currentCard - 1 + flashcards.length) % flashcards.length;
     setCurrentCard(newCard);
 
-    // Speak Side A for Cards 1-3 only
-    if (newCard < 3) {
-      speak(flashcards[newCard].sideA);
-    }
+    // Speak Side A when moving to new card
+    speak(flashcards[newCard].sideA);
   };
 
-  // Repeat the current TTS based on card and flip state
+  // Repeat the current TTS based on flip state
   const handleRepeat = () => {
-    if (currentCard < 3) {
-      // Cards 1-3: Repeat Side A if on front, nothing if on back
-      if (!isFlipped) {
-        speak(flashcards[currentCard].sideA);
-      }
+    if (!isFlipped) {
+      speak(flashcards[currentCard].sideA);
     } else {
-      // Cards 4-12: Repeat Side B if on back, nothing if on front
-      if (isFlipped) {
-        speak(flashcards[currentCard].sideB);
-      }
+      speak(flashcards[currentCard].sideB);
     }
   };
 
@@ -122,9 +107,12 @@ const FlashcardQuiz: React.FC = () => {
 
   return (
     <div className="max-w-5xl mx-auto p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl shadow-xl min-h-screen flex flex-col items-center">
-      <h1 className="text-4xl font-bold text-indigo-700 mb-8 text-center tracking-tight">
-        Greetings, Names and Numbers
+      <h1 className="text-4xl font-bold text-indigo-700 mb-4 text-center tracking-tight">
+        Session 1: Survival Phrases for USA
       </h1>
+      <p className="text-lg text-gray-600 mb-8 text-center max-w-2xl">
+        Learn essential phrases for daily interactions in America
+      </p>
 
       {/* Flashcard */}
       <motion.div
@@ -182,7 +170,7 @@ const FlashcardQuiz: React.FC = () => {
       {/* Instructions and TTS Controls */}
       <div className="text-center mt-8">
         <p className="text-gray-600 text-lg italic mb-4">
-          Click the card to flip. Hear greetings on the front, numbers on the back.
+          Click the card to flip and hear both the question and the response.
         </p>
         <div className="flex justify-center gap-4">
           <motion.button
