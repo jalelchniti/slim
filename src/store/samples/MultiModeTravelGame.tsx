@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FC } from 'react';
+import React, { useState, useEffect, FC, JSX } from 'react';
 import { 
   Plane, 
   Map, 

@@ -82,6 +82,12 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
               Listening
             </Link>
             <Link
+              to="/companion"
+              className="text-gray-700 hover:text-primary-600 px-3 py-2 font-medium"
+            >
+              Companion
+            </Link>
+            <Link
               to="/evaluation"
               className="text-gray-700 hover:text-primary-600 px-3 py-2 font-medium"
             >

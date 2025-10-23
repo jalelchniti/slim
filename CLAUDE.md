@@ -11,12 +11,29 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Commands
 
+### Core Commands
 - `npm run dev` - Start development server (typically runs on http://localhost:5173)
-- `npm run build` - Type check and build for production
+- `npm run build` - Type check and build for production (runs `tsc -b && vite build`)
 - `npm run preview` - Preview production build locally
 - `npm run serve` - Serve the dist folder using serve package
 - `npm run lint` - Run ESLint to check code quality
-- `npm test` or `npx vitest` - Run tests (Vitest configured with jsdom)
+- `npm run lint -- --fix` - Automatically fix linting issues
+
+### Testing Commands
+- `npm test` or `npx vitest` - Run all tests in watch mode
+- `npx vitest --run` - Run all tests once and exit
+- `npx vitest --run src/path/to/file.test.tsx` - Run tests for a specific file
+- `npx vitest --ui` - Open interactive test UI
+- `npx vitest --run --reporter=verbose` - Run tests with detailed output (useful for debugging)
+
+### Build Commands
+- `npx vite build` - Build for production without TypeScript checking (skips strict type validation)
+
+**Note on Build Commands:** The project uses `npm run build` for CI/CD (includes type checking) and `npx vite build` for quick local builds when you want to skip strict TypeScript checking. Both output to the `dist/` folder.
+
+**Development Notes:**
+- TypeScript strict mode is enabled - all source files must be `.tsx` (no `.js` files)
+- React components must be exported at the top level for React Refresh to work correctly (avoid exporting default from wrapped functions)
 
 ## Architecture Overview
 
@@ -55,8 +72,23 @@ src/store/
 │   ├── Reading/     # re_01-01.tsx, re_01-02.tsx, ...
 │   ├── Speaking/    # sp_01-01.tsx
 │   └── Listening/   # li_01-01.tsx
+├── u2/              # Unit 2 content (organized by skill) - Shopping & Directions
+│   ├── Vocabulary/  # vo_02-01.tsx through vo_02-04.tsx
+│   ├── Grammar/     # gr_02-01.tsx through gr_02-04.tsx
+│   ├── Reading/     # re_02-01.tsx through re_02-04.tsx
+│   ├── Speaking/    # sp_02-01.tsx through sp_02-04.tsx
+│   └── Listening/   # li_02-01.tsx through li_02-04.tsx
 └── plan.tsx         # Business calculator feature
 ```
+
+**Unit 2 Activities (20 Total)**
+Created based on `Students/Slim_Gharbi/Slim_Gharbi_Course_Schedule.md` Lesson 4: Shopping & Directions
+
+- **Vocabulary (4)**: Shopping, Directions & Landmarks, Currency & Payment, Shopping Conversation
+- **Grammar (4)**: Imperatives for Directions, Asking Questions, Prepositions of Place, Modal Verbs
+- **Reading (4)**: Shopping Information, Directions, Shopping Dialogue, Return & Exchange Policy
+- **Speaking (4)**: Asking for Directions, Shopping Phrases, Dialogue Practice, Role Play Scenarios
+- **Listening (4)**: Understanding Directions, Shopping Conversations, Landmarks & Locations, Prices & Numbers
 
 **Quiz Types**
 1. Flashcard Quizzes - Card flip with conditional TTS based on card index
@@ -106,6 +138,46 @@ const speak = (text: string) => {
 - Local component state for quiz logic
 - Refs for TTS deduplication
 
+### My English Companion Feature (`src/pages/MyCompanion.tsx`)
+
+**Overview:** AI-powered conversational English coach using HeyGen avatar
+
+**Components:**
+- Hero section with "My English Companion" heading
+- Instructions section with 5 guided steps
+- **Centered Avatar Section** - HeyGen streaming avatar (main focal point)
+- Features showcase (Real Conversations, AI Coaching, Track Progress)
+- Tips for better practice
+- Call-to-action section
+
+**HeyGen Integration:**
+- Embedded script injected via `useEffect` hook
+- Avatar appears as circular button, expands to full conversation view
+- Responsive design (mobile: 266px height, desktop: 366px × 16:9 aspect ratio)
+- Microphone required and requested on activation
+- Conversation auto-scales based on screen size
+
+**User Flow:**
+1. Navigate to `/companion`
+2. Read instructions and tips
+3. Click centered avatar button
+4. Grant microphone permission when prompted
+5. Start with greeting: "Hello. I am a non-native learner of English. My level is A1..."
+6. Avatar responds and guides conversation for ~10 minutes
+7. Copy conversation script to share with teacher on WhatsApp
+
+**Topics Covered:**
+- Personal introductions (who you are)
+- Shopping & transactions
+- Everyday activities & routines
+- Basic A1-level conversational English
+
+**Styling:**
+- White background section for avatar (high contrast)
+- Centered container with `flex` + `justify-center`
+- Minimum height of 250px for avatar container
+- Responsive padding and spacing
+
 ## Path Configuration
 
 **Import Alias** - `@/*` maps to `src/*`
@@ -135,6 +207,105 @@ const speak = (text: string) => {
    - For reading with highlighting: see comprehensive guide in `src/resources/Read_TTS_Highlight_Quiz_Docs.md`
 5. **Test** by navigating to `/quiz/{quizId}` (e.g., `/quiz/vo_01-05`)
 
+## Creating New Units from Course Schedule
+
+**Reference Document:** `Students/{StudentName}/{StudentName}_Course_Schedule.md`
+
+**Step-by-Step Process for Complete Unit Creation:**
+
+### 1. **Extract Lesson Information**
+   - Review the course schedule for the target lesson
+   - Identify: Learning objectives, learning items, topics covered
+   - Example: Lesson 4 focuses on "Shopping & Directions" with vocabulary, grammar, dialogue, and practical skills
+
+### 2. **Create Directory Structure**
+   ```bash
+   mkdir -p src/store/u{unit}/{Skill} for each skill
+   # Example: src/store/u2/Vocabulary, u2/Grammar, u2/Reading, u2/Speaking, u2/Listening
+   ```
+
+### 3. **Create 20 Quiz Files (4 per skill)**
+   - **Naming Convention**: `{skillCode}_{unit}-{lessonNumber}.tsx`
+   - **File Locations**: `src/store/u{unit}/{SkillType}/{filename}.tsx`
+   - **Pattern**: Create 4 activities per skill demonstrating different interaction types:
+     1. **Vocabulary**: Flashcard quizzes with definitions
+     2. **Grammar**: Multiple choice with explanations
+     3. **Reading**: Passages with comprehension questions
+     4. **Speaking**: Phrase practice and dialogue role-plays
+     5. **Listening**: Audio comprehension and QA
+
+### 4. **Content Guidelines - ENGLISH ONLY**
+   ⚠️ **ABSOLUTE RULE: Never use any language other than English**
+   - All explanations, synonyms, and definitions must be in **simple, basic English**
+   - Definitions should be beginner-friendly (A1 level)
+   - Each definition explains the concept clearly without translation
+   - Example: Instead of Arabic synonym, use: "A piece of clothing worn on the upper body"
+
+### 5. **Register All Quizzes in QuizPage.tsx**
+   ```typescript
+   // In src/pages/QuizPage.tsx, add to quizMap:
+   'vo_02-01': lazy(() => import('../store/u2/Vocabulary/vo_02-01')),
+   'gr_02-01': lazy(() => import('../store/u2/Grammar/gr_02-01')),
+   // ... repeat for all 20 quizzes, organized by skill and unit
+   ```
+
+### 6. **Update Skill Pages** (`src/pages/`)
+   Add entries to each skill page's content array:
+   - **VocabularyPage.tsx**: Add vo_02-01 through vo_02-04
+   - **GrammarPage.tsx**: Add gr_02-01 through gr_02-04
+   - **ReadingPage.tsx**: Add re_02-01 through re_02-04
+   - **SpeakingPage.tsx**: Add sp_02-01 through sp_02-04
+   - **ListeningPage.tsx**: Add li_02-01 through li_02-04
+
+   Structure for each item:
+   ```typescript
+   {
+     id: 'skillCode_unit-lesson',
+     title: 'Activity Title',
+     content: 'Short description',
+     level: 'A1',
+     topic: 'Topic category',
+     quizId: 'skillCode_unit-lesson'
+   }
+   ```
+
+### 7. **Update HomePage** (`src/pages/HomePage.tsx`)
+   - Update featured practice section with new unit details
+   - Change featured quiz links to new unit quizzes
+   - Update `featuredLessonPoints` array with new unit topics
+
+### 8. **Test All Routes**
+   ```bash
+   npm run dev
+   # Visit: http://localhost:5173/vocabulary (shows all vocab items)
+   # Click on new unit items
+   # Verify routing to /quiz/{quizId} works
+   # Test TTS functionality
+   ```
+
+### 9. **Verify Integration**
+   - ✅ Quizzes accessible from skill pages
+   - ✅ Direct URL access works: `/quiz/vo_02-01`
+   - ✅ HomePage features new unit
+   - ✅ All links properly routed
+   - ✅ No Arabic or other language text
+   - ✅ TTS working in all quizzes
+
+## Code Quality and Testing
+
+**ESLint Configuration** (`eslint.config.js`)
+- Enforces React Hooks rules via `eslint-plugin-react-hooks`
+- Warns on missing React Refresh exports with `react-refresh/only-export-components`
+- TypeScript ESLint recommended rules enabled
+- Ignores `dist` folder during linting
+- All source files must be `.tsx` (100% TypeScript)
+
+**Testing Setup** (`vitest.config.ts`)
+- Test environment: jsdom (browser-like environment)
+- Global test utilities enabled
+- Setup file: `src/test/setup.ts`
+- Run with: `npm test` (watch mode) or `npx vitest --run` (single run)
+
 ## Technology Stack
 
 - React 18 + TypeScript + Vite 6
@@ -142,9 +313,18 @@ const speak = (text: string) => {
 - Tailwind CSS 3 + Framer Motion
 - Radix UI + custom shadcn/ui-style components
 - Zustand (state management - minimal usage)
-- Vitest (testing - configured, tests may be minimal)
+- Vitest (testing - configured with jsdom)
 - Icons: Lucide React, React Icons
 - Carousel: react-responsive-carousel (used in EFLCurriculumCarousel)
+
+## Key Configuration Files
+
+- `tsconfig.json` - TypeScript configuration with path alias `@/*` → `src/*`
+- `vite.config.ts` - Vite build config with React plugin and base path `/slim/`
+- `vitest.config.ts` - Test environment setup with jsdom
+- `eslint.config.js` - Linting rules for React Hooks and TypeScript
+- `tailwind.config.ts` - Tailwind CSS customization
+- `postcss.config.js` - PostCSS plugins for Tailwind
 
 ## Branding Assets
 
@@ -166,10 +346,20 @@ const speak = (text: string) => {
 **Standard Deployment Method: Manual FTP Upload**
 
 ### Build for Production
+
+**Option 1: Full build with TypeScript checking** (recommended for production)
+```bash
+npm run build
+```
+This runs both type checking and Vite build. Fails if TypeScript errors exist.
+
+**Option 2: Skip TypeScript checking** (for quick local builds)
 ```bash
 npx vite build
 ```
-Note: Use `npx vite build` (not `npm run build`) to skip TypeScript strict checking. The app runs perfectly but has non-critical type issues.
+Builds without strict type validation. The app runs perfectly but may have non-critical type issues.
+
+Both commands output to the `dist/` folder.
 
 ### FTP Upload Process
 1. Build creates optimized files in `dist` folder
@@ -182,15 +372,41 @@ Note: Use `npx vite build` (not `npm run build`) to skip TypeScript strict check
 4. See `DEPLOYMENT.md` for detailed FTP instructions and troubleshooting
 
 ### Important Deployment Notes
-- **Base path configuration**: Set to `/slim/` in two places:
+- **Base path configuration**: Critical to set `/slim/` in two places - if they don't match, routing will fail:
   - `vite.config.ts`: `base: '/slim/'`
   - `src/main.tsx`: `<BrowserRouter basename="/slim">`
-  - Both must match for routing to work correctly
-- **Deploy to `/slim/` folder**: Upload all `dist/` contents to server's `/slim/` directory
-- **Root landing page**: `dist-root-index.html` provides branded welcome page (upload as `/index.html`)
-- SPA routing handled by `.htaccess` file (auto-included in build, goes in `/slim/` folder)
-- Asset files include cache-busting hashes
+- **Deploy to `/slim/` folder**: Upload all `dist/` contents to server's `/slim/` directory (not root!)
+- **Root landing page**: `dist-root-index.html` provides branded welcome page (upload separately as `/index.html`)
+- SPA routing handled by `.htaccess` file (auto-included in build, must be in `/slim/` folder)
+- Asset files include cache-busting hashes for better caching
 - Total bundle size: ~144 KB (gzipped main bundle + lazy-loaded quiz chunks)
+
+## Common Development Workflows
+
+**Adding a New Quiz**
+```
+1. Choose template from src/store/samples/
+2. Create file: src/store/u{unit}/{Skill}/{skillCode}_{unit}-{lesson}.tsx
+3. Add to quizMap in src/pages/QuizPage.tsx
+4. Test at /quiz/{quizId} (with npm run dev)
+5. npm run lint to check code quality
+```
+
+**Checking Code Quality Before Commit**
+```bash
+npm run lint              # Check for linting issues
+npm run build             # Full type check + build
+npm test                  # Run tests (watch mode)
+npx vitest --run          # Run tests once
+```
+
+**Local Build Preview**
+```bash
+npx vite build            # Quick build (skips type check)
+npm run preview           # Preview at http://localhost:5173
+# OR
+npm run serve             # Serve dist folder (closer to production)
+```
 
 ## Important Notes
 
@@ -198,8 +414,118 @@ Note: Use `npx vite build` (not `npm run build`) to skip TypeScript strict check
 - **Writing Skill Removed**: Project focuses on Vocabulary, Grammar, Reading, Speaking, and Listening
 - **TTS Browser Support**: Web Speech API works best in Chrome/Edge
 - **Resources**: `src/resources/Read_TTS_Highlight_Quiz_Docs.md` contains comprehensive TTS implementation guide
-- **Additional Features**: Business calculator in `src/store/plan.tsx`, curriculum carousel at `/curriculum`
+- **Additional Features**:
+  - Business calculator in `src/store/plan.tsx`
+  - Curriculum carousel at `/curriculum`
+  - **My English Companion** at `/companion` - AI-powered avatar for conversational practice
 - **Deployment Files**:
   - `DEPLOYMENT.md` - Complete FTP upload guide
   - `DEPLOYMENT_READY.md` - Quick deployment checklist with troubleshooting
+  - `FTP_DEPLOYMENT_OVH_GUIDE.md` - Comprehensive OVH deployment guide (v3)
+  - `DEPLOYMENT_CHECKLIST.md` - Quick reference checklist
   - `dist-root-index.html` - Optional root landing page
+
+## Language & Content Guidelines
+
+⚠️ **ABSOLUTE RULE: English Only - No Other Languages Allowed**
+
+### Never Use:
+- ❌ Arabic translations or synonyms
+- ❌ Any language other than English
+- ❌ Transliteration or code-switching
+- ❌ Mixed-language explanations
+
+### Always Use:
+- ✅ Simple, basic English explanations
+- ✅ Beginner-friendly vocabulary (A1 level)
+- ✅ Clear, direct descriptions
+- ✅ Contextual examples in English only
+- ✅ TTS for pronunciation support (English only)
+
+### Example - Correct Approach:
+```typescript
+// ✅ CORRECT
+{ sideA: "Shirt", sideB: "A piece of clothing worn on the upper body" }
+
+// ❌ WRONG
+{ sideA: "Shirt", sideB: "قميص" }
+```
+
+## Deployment Versions
+
+### Version 1 - Unit 1 Only (Introductions)
+**Status:** ✅ Deployed to OVH `/slim/` directory
+
+**Contents:**
+- Vocabulary: 4 quizzes (Introductions, Everyday Objects, Classroom Objects)
+- Grammar: 4 quizzes (Verb To Be, Present Simple, Yes/No Questions)
+- Reading: 4 passages (All About You, Anna's Daily Life, Notices, Relationships)
+- Speaking: 1 activity (Introducing Yourself)
+- Listening: 1 activity (Short Conversations)
+- **Total:** 14 interactive exercises
+- **Features:** Flashcards with TTS, Multiple choice quizzes, Reading comprehension
+
+**Flashcard Images Fixed:**
+- Updated all flashcard image paths to include `/slim/` prefix for correct deployment
+- All 8 available images (table, chair, door, window, bed, desk, lamp, book) properly configured
+- TTS working for all flashcard activities
+
+### Version 2 - Units 1 & 2 (Full Content) ✨ NOW WITH ALL U2 BUNDLED!
+**Status:** ✅ **FULLY COMPLETE & READY FOR DEPLOYMENT**
+
+**Build Configuration:**
+- **vite.config.ts** enhanced with `manualChunks` for proper code splitting
+- All 34 quizzes bundled as separate, lazy-loaded chunks
+- U1: 12 quiz files + 5 skill chunks
+- U2: 20 quiz files + 5 skill chunks
+
+**Contents:**
+- **Unit 1 (14 exercises):**
+  - Vocabulary (4), Grammar (4), Reading (4), Speaking (1), Listening (1)
+
+- **Unit 2 (20 exercises) - ALL INCLUDED:**
+  - Vocabulary (4): Shopping, Directions & Landmarks, Currency & Payment, Shopping Conversation
+  - Grammar (4): Imperatives for Directions, Asking Questions, Prepositions of Place, Modal Verbs
+  - Reading (4): Shopping Information, Directions, Shopping Dialogue, Return & Exchange Policy
+  - Speaking (4): Asking for Directions, Shopping Phrases, Dialogue Practice, Role Play Scenarios
+  - Listening (4): Understanding Directions, Shopping Conversations, Landmarks & Locations, Prices & Numbers
+
+**Total: 34 interactive exercises**
+
+**Build Statistics:**
+- **Total Build Size:** 2.0 MB (uncompressed)
+- **Gzipped:** ~150 KB (optimized for transfer)
+- **Total Files:** 60 (including .htaccess, index.html, vite.svg, assets)
+- **JavaScript Files:** 43 (12 U1 quizzes + 20 U2 quizzes + chunks + main bundle)
+- **CSS Files:** 2 (Tailwind + App CSS)
+- **Images:** 12 (flashcard images + branding)
+- **Build Time:** ~30 seconds
+
+**Version 2 Features:**
+- ✅ All U1 quizzes with fixed flashcard images and correct `/slim/` paths
+- ✅ **ALL U2 quizzes included** (20 separate lazy-loaded chunks)
+- ✅ Complete Unit 2 content with shopping and navigation themes
+- ✅ Featured Unit 2 section on HomePage promoting new curriculum
+- ✅ All skill pages updated with full content (8 items each: Vocab, Grammar, Reading; 5 items each: Speaking, Listening)
+- ✅ TTS working across all interactive activities
+- ✅ Proper code splitting with individual quiz chunks
+- ✅ Created October 2024 - Based on Slim_Gharbi_Course_Schedule.md Lesson 4
+- ✅ Theme: Shopping & Directions (practical, real-world vocabulary)
+- ✅ Content: Fully in English with simple definitions
+- ✅ Routing: All 34 quizzes registered in QuizPage.tsx
+- ✅ Integration: Added to all skill pages and featured on HomePage
+- ✅ Testing: All routes verified, TTS working, navigation complete
+- ✅ .htaccess configured for SPA routing and caching
+
+**Deployment Package Ready:**
+- **Location:** `C:\Users\asus\en-a1\dist\`
+- **Contents:** All files ready for FTP upload to OVH `/slim/` directory
+- **Deployment Time:** ~5-10 minutes (depending on connection)
+- **Testing:** 12-point post-deployment checklist available in FTP_DEPLOYMENT_VERSION_2.md
+
+**Deployment Strategy:**
+- **Version 1 (U1 Only):** Already deployed to OVH `/slim/` for initial launch
+- **Version 2 (U1 + U2):** ✅ **NOW READY** for deployment - all U2 content properly bundled
+- Both versions maintain flashcard image paths with `/slim/` prefix
+- Both versions fully functional with TTS enabled
+- **Key Fix:** Updated `vite.config.ts` with `manualChunks` to ensure U2 files are created as separate bundles
