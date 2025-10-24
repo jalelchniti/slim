@@ -4,14 +4,12 @@ import { motion } from 'framer-motion';
 const flashcards = [
   { id: 1, image: 'table.png', word: 'Table' },
   { id: 2, image: 'chair.png', word: 'Chair' },
-  { id: 3, image: 'blackboard.png', word: 'Blackboard' },
-  { id: 4, image: 'desk.png', word: 'Desk' },
-  { id: 5, image: 'notebook.png', word: 'Notebook' },
-  { id: 6, image: 'pencil.png', word: 'Pencil' },
-  { id: 7, image: 'backpack.png', word: 'Backpack' },
-  { id: 8, image: 'textbook.png', word: 'Textbook' },
-  { id: 9, image: 'eraser.png', word: 'Eraser' },
-  { id: 10, image: 'ruler.png', word: 'Ruler' },
+  { id: 3, image: 'desk.png', word: 'Desk' },
+  { id: 4, image: 'door.png', word: 'Door' },
+  { id: 5, image: 'window.png', word: 'Window' },
+  { id: 6, image: 'bed.png', word: 'Bed' },
+  { id: 7, image: 'lamp.png', word: 'Lamp' },
+  { id: 8, image: 'book.png', word: 'Book' },
 ];
 
 const FlashcardQuiz = () => {
@@ -63,7 +61,7 @@ const FlashcardQuiz = () => {
         >
           <div className="absolute w-full h-full backface-hidden" style={{ backfaceVisibility: 'hidden' }}>
             <img
-              src={`/assets/images/${flashcards[currentIndex].image}`}
+              src={`/slim/assets/images/${flashcards[currentIndex].image}`}
               alt={flashcards[currentIndex].word}
               className="w-full h-full object-contain"
             />

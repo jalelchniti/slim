@@ -15,24 +15,58 @@ const ReadingPage = () => {
   const [selectedTopic, setSelectedTopic] = useState<string>('All Topics');
 
   const readingContent: ReadingItem[] = [
-    { 
-      id: 're_01-01', 
-      title: 'All About You', 
-      content: 'Read about jobs and personal information.', 
-      level: 'A1', 
-      topic: 'Personal Information', 
+    // Unit 1
+    {
+      id: 're_01-01',
+      title: 'All About You',
+      content: 'Read about jobs and personal information.',
+      level: 'A1',
+      topic: 'Personal Information',
       quizId: 're_01-01'
     },
-    { 
-      id: 're_01-02', 
-      title: 'Anna’s Daily Life', 
-      content: 'Read about Anna’s house and daily routine.', 
-      level: 'A1', 
-      topic: 'Short Texts', 
+    {
+      id: 're_01-02',
+      title: "Anna's Daily Life",
+      content: "Read about Anna's house and daily routine.",
+      level: 'A1',
+      topic: 'Short Texts',
       quizId: 're_01-02'
     },
     { id: 're_01-03', title: 'Basic Notices', content: 'Read signs, notices, and short texts.', level: 'A1', topic: 'Notices' },
     { id: 're_01-04', title: 'Family and Friends', content: 'Understand texts about family and friends.', level: 'A1', topic: 'Relationships' },
+    // Unit 2
+    {
+      id: 're_02-01',
+      title: 'Shopping Information',
+      content: 'Read store information, hours, and special offers.',
+      level: 'A1',
+      topic: 'Shopping',
+      quizId: 're_02-01'
+    },
+    {
+      id: 're_02-02',
+      title: 'Directions',
+      content: 'Read and understand step-by-step navigation instructions.',
+      level: 'A1',
+      topic: 'Directions',
+      quizId: 're_02-02'
+    },
+    {
+      id: 're_02-03',
+      title: 'Shopping Dialogue',
+      content: 'Read and understand conversations between customers and cashiers.',
+      level: 'A1',
+      topic: 'Conversations',
+      quizId: 're_02-03'
+    },
+    {
+      id: 're_02-04',
+      title: 'Return & Exchange Policy',
+      content: 'Read and understand store policies and procedures.',
+      level: 'A1',
+      topic: 'Notices',
+      quizId: 're_02-04'
+    },
   ];
 
   const filteredReading = selectedTopic === 'All Topics'

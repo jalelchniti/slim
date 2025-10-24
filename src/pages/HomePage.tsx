@@ -65,31 +65,31 @@ const HomePage = () => {
           ))}
         </div>
       </section>
-      
-      {/* Featured Practice */}
+
+      {/* Featured Practice - Unit 2 */}
       <section className="card overflow-hidden">
         <div className="md:flex">
-          <div className="md:w-1/2 bg-gray-100 p-6 md:p-10">
-            <span className="inline-block bg-accent-100 text-accent-800 rounded-full px-3 py-1 text-sm font-medium mb-4">
-              Featured Practice
+          <div className="md:w-1/2 bg-gradient-to-br from-orange-50 to-orange-100 p-6 md:p-10">
+            <span className="inline-block bg-orange-200 text-orange-800 rounded-full px-3 py-1 text-sm font-medium mb-4">
+              🆕 Unit 2: Shopping & Directions
             </span>
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">Essential Verb Forms (A1)</h2>
-            <p className="text-gray-700 mb-6">Master the verb "to be" with interactive quizzes and flashcards designed for beginners.</p>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">Master Shopping & Navigation (A1)</h2>
+            <p className="text-gray-700 mb-6">Learn practical vocabulary and phrases for shopping, asking directions, and understanding locations with interactive quizzes and flashcards.</p>
             <div className="flex gap-4">
-              <Link to="/quiz/gr_01-01" className="btn btn-primary">
-                Take Quiz
+              <Link to="/quiz/vo_02-01" className="btn btn-primary">
+                Shopping Vocabulary
               </Link>
-              <Link to="/quiz/gr_01-02" className="btn bg-green-100 text-green-800 hover:bg-green-200">
-                View Flashcards
+              <Link to="/quiz/gr_02-01" className="btn bg-orange-100 text-orange-800 hover:bg-orange-200">
+                Imperatives Quiz
               </Link>
             </div>
           </div>
-          <div className="md:w-1/2 bg-primary-700 p-6 md:p-10 text-white">
-            <h3 className="text-xl font-bold mb-4">What's Included:</h3>
+          <div className="md:w-1/2 bg-gradient-to-b from-orange-600 to-orange-700 p-6 md:p-10 text-white">
+            <h3 className="text-xl font-bold mb-4">📚 Topics Covered:</h3>
             <ul className="space-y-3">
               {featuredLessonPoints.map((point, index) => (
                 <li key={index} className="flex items-start">
-                  <svg className="h-6 w-6 text-primary-300 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-6 w-6 text-orange-300 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   <span>{point}</span>
@@ -150,11 +150,11 @@ const categories = [
 ];
 
 const featuredLessonPoints = [
-  "Interactive verb conjugation practice",
-  "Instant feedback on answers",
-  "Flashcards with audio pronunciation",
-  "Progress tracking system",
-  "Beginner-friendly explanations"
+  "🛍️ Shopping vocabulary & transactions",
+  "🗺️ Asking for and giving directions",
+  "💬 Real-world dialogue practice",
+  "🔊 Text-to-speech & pronunciation",
+  "✅ Interactive quizzes & role plays"
 ];
 
 export default HomePage;

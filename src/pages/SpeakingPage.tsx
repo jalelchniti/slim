@@ -14,12 +14,42 @@ const SpeakingPage = () => {
   const [selectedTopic, setSelectedTopic] = useState<string>('All Topics');
 
   const speakingContent: SpeakingItem[] = [
-    { 
-      id: 'sp_01-01', 
-      title: 'Introducing Yourself', 
-      content: 'Saying hello/goodbye, telling your name, age, nationality, occupation', 
-      level: 'A1', 
-      topic: 'Introductions' 
+    // Unit 1
+    {
+      id: 'sp_01-01',
+      title: 'Introducing Yourself',
+      content: 'Saying hello/goodbye, telling your name, age, nationality, occupation',
+      level: 'A1',
+      topic: 'Introductions'
+    },
+    // Unit 2
+    {
+      id: 'sp_02-01',
+      title: 'Asking for Directions',
+      content: 'Learn key phrases for asking directions and understanding responses.',
+      level: 'A1',
+      topic: 'Directions'
+    },
+    {
+      id: 'sp_02-02',
+      title: 'Shopping Phrases',
+      content: 'Practice essential phrases used in shopping conversations.',
+      level: 'A1',
+      topic: 'Shopping'
+    },
+    {
+      id: 'sp_02-03',
+      title: 'Dialogue Practice',
+      content: 'Engage in practical dialogue scenarios about directions and shopping.',
+      level: 'A1',
+      topic: 'Conversations'
+    },
+    {
+      id: 'sp_02-04',
+      title: 'Role Play Scenarios',
+      content: 'Practice real-world role-play situations for shopping and navigation.',
+      level: 'A1',
+      topic: 'Role Play'
     },
   ];
 
@@ -71,7 +101,7 @@ const SpeakingPage = () => {
               <h3 className="text-xl font-bold text-indigo-700 mb-2">{item.title}</h3>
               <p className="text-gray-700 mb-4">{item.content}</p>
               <div className="flex justify-between items-center">
-                {item.id === 'sp_01-01' ? (
+                {(item.id.startsWith('sp_01-') || item.id.startsWith('sp_02-')) ? (
                   <Link
                     to={`/quiz/${item.id}`}
                     className="text-sm text-indigo-600 hover:underline"

@@ -3,14 +3,14 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 const flashcards = [
-  { word: 'table', image: '/assets/images/table.png' },
-  { word: 'chair', image: '/assets/images/chair.png' },
-  { word: 'door', image: '/assets/images/door.png' },
-  { word: 'window', image: '/assets/images/window.png' },
-  { word: 'bed', image: '/assets/images/bed.png' },
-  { word: 'desk', image: '/assets/images/desk.png' },
-  { word: 'lamp', image: '/assets/images/lamp.png' },
-  { word: 'book', image: '/assets/images/book.png' },
+  { word: 'table', image: '/slim/assets/images/table.png' },
+  { word: 'chair', image: '/slim/assets/images/chair.png' },
+  { word: 'door', image: '/slim/assets/images/door.png' },
+  { word: 'window', image: '/slim/assets/images/window.png' },
+  { word: 'bed', image: '/slim/assets/images/bed.png' },
+  { word: 'desk', image: '/slim/assets/images/desk.png' },
+  { word: 'lamp', image: '/slim/assets/images/lamp.png' },
+  { word: 'book', image: '/slim/assets/images/book.png' },
 ];
 
 const FlashcardQuiz: React.FC = () => {

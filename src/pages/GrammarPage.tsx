@@ -16,6 +16,7 @@ const GrammarPage = () => {
   const [selectedTopic, setSelectedTopic] = useState<string>('All Topics');
 
   const grammarContent: GrammarItem[] = [
+    // Unit 1
     {
       id: 'gr_01-01',
       title: 'Verb To Be',
@@ -47,6 +48,39 @@ const GrammarPage = () => {
       level: 'A1',
       topic: 'Tenses',
       flashcardId: 'gr_01-04',
+    },
+    // Unit 2
+    {
+      id: 'gr_02-01',
+      title: 'Imperatives for Directions',
+      content: 'Learn how to use imperative forms to give directions.',
+      level: 'A1',
+      topic: 'Verbs',
+      quizId: 'gr_02-01',
+    },
+    {
+      id: 'gr_02-02',
+      title: 'Asking Questions',
+      content: 'Master question formation for asking directions and information.',
+      level: 'A1',
+      topic: 'Questions',
+      quizId: 'gr_02-02',
+    },
+    {
+      id: 'gr_02-03',
+      title: 'Prepositions of Place & Direction',
+      content: 'Practice prepositions used for locations and directions.',
+      level: 'A1',
+      topic: 'Prepositions',
+      quizId: 'gr_02-03',
+    },
+    {
+      id: 'gr_02-04',
+      title: 'Modal Verbs & Polite Requests',
+      content: 'Learn modal verbs to make polite requests and ask for help.',
+      level: 'A1',
+      topic: 'Verbs',
+      quizId: 'gr_02-04',
     },
   ];
 

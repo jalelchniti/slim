@@ -320,11 +320,30 @@ const speak = (text: string) => {
 ## Key Configuration Files
 
 - `tsconfig.json` - TypeScript configuration with path alias `@/*` → `src/*`
-- `vite.config.ts` - Vite build config with React plugin and base path `/slim/`
+- `vite.config.ts` - **IMPORTANT:** Vite build config with React plugin, base path `/slim/`, and `manualChunks` configuration for quiz code splitting
 - `vitest.config.ts` - Test environment setup with jsdom
 - `eslint.config.js` - Linting rules for React Hooks and TypeScript
 - `tailwind.config.ts` - Tailwind CSS customization
 - `postcss.config.js` - PostCSS plugins for Tailwind
+
+### Code Splitting with manualChunks
+
+**Location:** `vite.config.ts` lines 13-32
+
+**How it works:**
+- Each skill's quizzes are bundled into separate chunks: `u1-vocabulary`, `u1-grammar`, etc.
+- This reduces initial bundle size - only needed quiz chunks are loaded
+- **When adding new quizzes:** Add their file paths to the appropriate chunk in `manualChunks`
+- Example: Adding `vo_03-01.tsx` requires adding it to a `u3-vocabulary` chunk entry
+
+**Current chunks:**
+- U1: `u1-vocabulary`, `u1-grammar`, `u1-reading`, `u1-speaking`, `u1-listening`
+- U2: `u2-vocabulary`, `u2-grammar`, `u2-reading`, `u2-speaking`, `u2-listening`
+
+**When to update manualChunks:**
+- When creating Unit 3, 4, etc., add new chunk definitions
+- When adding quizzes beyond lessons 1-4, update the file path array for that chunk
+- Build will fail if file paths in chunks don't exist - fix by adding actual file paths or removing non-existent ones
 
 ## Branding Assets
 
@@ -381,38 +400,55 @@ Both commands output to the `dist/` folder.
 - Asset files include cache-busting hashes for better caching
 - Total bundle size: ~144 KB (gzipped main bundle + lazy-loaded quiz chunks)
 
+## Quiz Registration Reference
+
+**Location of quiz map:** `src/pages/QuizPage.tsx` (line ~45)
+
+**Registration syntax:**
+```typescript
+const quizMap = {
+  'skillCode_unit-lesson': lazy(() => import('../store/u{unit}/{Skill}/{skillCode}_{unit}-{lesson}')),
+};
+```
+
+**Quiz ID Format:** `{skillCode}_{unitNumber}-{lessonNumber}`
+- Example: `vo_02-03` = Vocabulary Unit 2 Lesson 3
+- Skill codes: `vo`, `gr`, `re`, `sp`, `li`
+- Must match filename exactly
+
 ## Common Development Workflows
 
-**Adding a New Quiz**
+**Adding a New Quiz (Quick Reference)**
 ```
 1. Choose template from src/store/samples/
 2. Create file: src/store/u{unit}/{Skill}/{skillCode}_{unit}-{lesson}.tsx
-3. Add to quizMap in src/pages/QuizPage.tsx
-4. Test at /quiz/{quizId} (with npm run dev)
-5. npm run lint to check code quality
+3. Add entry to quizMap in src/pages/QuizPage.tsx
+4. Add content item to corresponding skill page (src/pages/{SkillName}Page.tsx)
+5. Test at http://localhost:5173/quiz/{quizId}
+6. npm run lint -- --fix to ensure quality
 ```
 
 **Checking Code Quality Before Commit**
 ```bash
 npm run lint              # Check for linting issues
-npm run build             # Full type check + build
+npm run build             # Full type check + build (REQUIRED before deploy)
 npm test                  # Run tests (watch mode)
-npx vitest --run          # Run tests once
+npx vitest --run          # Run tests once (single run)
 ```
 
 **Local Build Preview**
 ```bash
-npx vite build            # Quick build (skips type check)
-npm run preview           # Preview at http://localhost:5173
-# OR
-npm run serve             # Serve dist folder (closer to production)
+npm run build             # Production build with type checking
+npm run preview           # Preview production build locally (on /slim/)
+# OR for quick test without type check:
+npx vite build && npm run serve
 ```
 
 ## Important Notes
 
 - **100% TypeScript**: All JavaScript files removed - project uses only `.tsx` files
 - **Writing Skill Removed**: Project focuses on Vocabulary, Grammar, Reading, Speaking, and Listening
-- **TTS Browser Support**: Web Speech API works best in Chrome/Edge
+- **TTS Browser Support**: Web Speech API works best in Chrome/Edge (Safari has limited support, Firefox requires user gesture)
 - **Resources**: `src/resources/Read_TTS_Highlight_Quiz_Docs.md` contains comprehensive TTS implementation guide
 - **Additional Features**:
   - Business calculator in `src/store/plan.tsx`
@@ -424,6 +460,45 @@ npm run serve             # Serve dist folder (closer to production)
   - `FTP_DEPLOYMENT_OVH_GUIDE.md` - Comprehensive OVH deployment guide (v3)
   - `DEPLOYMENT_CHECKLIST.md` - Quick reference checklist
   - `dist-root-index.html` - Optional root landing page
+
+## Troubleshooting Common Issues
+
+**Build Fails with TypeScript Errors**
+- Use `npm run build` to catch all type errors before deployment
+- Fix errors in the source files - they must resolve for production
+- If you need quick iteration, use `npx vite build` to skip type checking temporarily
+- Always run full `npm run build` before committing or deploying
+
+**Routing Not Working (404 or Blank Page)**
+- Verify `basename="/slim"` is set in `src/main.tsx`
+- Verify `base: '/slim/'` is set in `vite.config.ts`
+- Both must match or routing will fail
+- When testing locally with `npm run dev`, routes use `/quiz/` not `/slim/quiz/`
+
+**TTS Not Working**
+- Test in Chrome or Edge (best support)
+- Check if microphone/audio permissions are blocked
+- Ensure `isTtsEnabled` state is true in the component
+- Verify voices are loaded: browser console should show voices available
+- Test with simple speech first: `window.speechSynthesis.speak(utterance)`
+
+**Quiz Not Loading**
+- Verify quiz ID in URL matches entry in `quizMap` in `src/pages/QuizPage.tsx`
+- Verify quiz file exists at correct path: `src/store/u{unit}/{Skill}/{quizId}.tsx`
+- Check browser console for import errors
+- Ensure lazy import syntax is correct: `lazy(() => import('...'))`
+
+**Flashcard Images Not Showing**
+- Images must be in `public/assets/images/`
+- Image paths in code should use relative paths: `/assets/images/image-name.jpg`
+- Vite automatically prefixes with base path (`/slim/`) in production
+- In development with `npm run dev`, use same paths (no `/slim/` prefix needed)
+
+**Asset Files Not Found (404 in Production)**
+- Build adds hash to filenames: `assets/index-abc123.css`
+- Ensure `npm run build` completes successfully before deploying
+- Check that all files in `dist/` folder are uploaded to `/slim/` directory
+- Verify `.htaccess` file is included in upload (handles SPA routing)
 
 ## Language & Content Guidelines
 

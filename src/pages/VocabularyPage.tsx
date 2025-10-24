@@ -16,6 +16,7 @@ const VocabularyPage = () => {
   const [selectedTopic, setSelectedTopic] = useState<string>('All Topics');
 
   const vocabularyContent: VocabularyItem[] = [
+    // Unit 1
     {
       id: 'vo_01-01',
       title: 'Introductions Flashcards',
@@ -47,6 +48,39 @@ const VocabularyPage = () => {
       level: 'A1',
       topic: 'Classroom Objects',
       flashcardId: 'vo_01-04',
+    },
+    // Unit 2
+    {
+      id: 'vo_02-01',
+      title: 'Shopping Vocabulary',
+      content: 'Learn clothing, prices, and shopping-related vocabulary with flashcards.',
+      level: 'A1',
+      topic: 'Shopping',
+      quizId: 'vo_02-01',
+    },
+    {
+      id: 'vo_02-02',
+      title: 'Directions & Landmarks',
+      content: 'Practice directional vocabulary and landmark names with flashcards.',
+      level: 'A1',
+      topic: 'Directions',
+      quizId: 'vo_02-02',
+    },
+    {
+      id: 'vo_02-03',
+      title: 'Currency & Payment',
+      content: 'Learn currency vocabulary, payment methods, and transaction terms.',
+      level: 'A1',
+      topic: 'Shopping',
+      quizId: 'vo_02-03',
+    },
+    {
+      id: 'vo_02-04',
+      title: 'Shopping Conversation Vocabulary',
+      content: 'Practice vocabulary used in shopping dialogues and transactions.',
+      level: 'A1',
+      topic: 'Shopping',
+      quizId: 'vo_02-04',
     },
   ];
 

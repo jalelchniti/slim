@@ -12,11 +12,18 @@ dist
 dist-ssr
 *.local
 
+# TypeScript auto-compilation (Visual Studio/IDE)
+src/**/*.js
+src/**/*.jsx
+!src/index.js
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
+.vs
+.vscode
 *.suo
 *.ntvs*
 *.njsproj

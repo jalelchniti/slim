@@ -3,31 +3,31 @@ import { motion } from 'framer-motion';
 
 const MyCompanion = () => {
   useEffect(() => {
+    let scriptElement = null;
+
     // Wait for avatar container to be available
     const waitForContainer = setInterval(() => {
       const avatarContainer = document.getElementById('heygen-avatar-container');
-      if (avatarContainer) {
+      if (avatarContainer && !scriptElement) {
         clearInterval(waitForContainer);
 
         // Inject the HeyGen embedding script
-        const script = document.createElement('script');
-        script.innerHTML = `!function(window){const host="https://labs.heygen.com",url=host+"/guest/streaming-embed?share=eyJxdWFsaXR5IjoiaGlnaCIsImF2YXRhck5hbWUiOiJUaGFkZGV1c19Qcm9mZXNzaW9uYWxMb29r%0D%0AX3B1YmxpYyIsInByZXZpZXdJbWciOiJodHRwczovL2ZpbGVzMi5oZXlnZW4uYWkvYXZhdGFyL3Yz%0D%0ALzhkYzJjYWExNzJjZDRlNjc5NmIzN2U5ZjE2OTU0YjdlXzU1OTUwL3ByZXZpZXdfdGFyZ2V0Lndl%0D%0AYnAiLCJuZWVkUmVtb3ZlQmFja2dyb3VuZCI6dHJ1ZSwia25vd2xlZGdlQmFzZUlkIjoiNTY0OWZl%0D%0AZTc5YjlkNDFiNDlmNDEyYzM3ODM5NTQwY2QiLCJ1c2VybmFtZSI6IjI0MGU3NDU3OGUzNTQ1MzM5%0D%0AMmIwYmU5MGE2OTE0NDNmIn0%3D&inIFrame=1",clientWidth=document.body.clientWidth,wrapDiv=document.createElement("div");wrapDiv.id="heygen-streaming-embed";const container=document.createElement("div");container.id="heygen-streaming-container";const stylesheet=document.createElement("style");stylesheet.innerHTML="\\n  #heygen-streaming-embed {\\n    z-index: 999;\\n    position: relative;\\n    margin: 0 auto;\\n    width: 200px;\\n    height: 200px;\\n    border-radius: 50%;\\n    border: 2px solid #fff;\\n    box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.12);\\n    transition: all linear 0.1s;\\n    overflow: hidden;\\n\\n    opacity: 0;\\n    visibility: hidden;\\n  }\\n  #heygen-streaming-embed.show {\\n    opacity: 1;\\n    visibility: visible;\\n  }\\n  #heygen-streaming-embed.expand {\\n    " + (clientWidth<540?"height: 266px; width: 96%; margin: 0 auto;":"height: 366px; width: calc(366px * 16 / 9); margin: 0 auto;") + "\\n    border: 0;\\n    border-radius: 8px;\\n  }\\n  #heygen-streaming-container {\\n    width: 100%;\\n    height: 100%;\\n  }\\n  #heygen-streaming-container iframe {\\n    width: 100%;\\n    height: 100%;\\n    border: 0;\\n  }\\n  ";const iframe=document.createElement("iframe");iframe.allowFullscreen=!1,iframe.title="Streaming Embed",iframe.role="dialog",iframe.allow="microphone",iframe.src=url;let visible=!1,initial=!1;window.addEventListener("message",(e=>{e.origin===host&&e.data&&e.data.type&&"streaming-embed"===e.data.type&&("init"===e.data.action?(initial=!0,wrapDiv.classList.toggle("show",initial)):"show"===e.data.action?(visible=!0,wrapDiv.classList.toggle("expand",visible)):"hide"===e.data.action&&(visible=!1,wrapDiv.classList.toggle("expand",visible)))})),container.appendChild(iframe),wrapDiv.appendChild(stylesheet),wrapDiv.appendChild(container),document.getElementById("heygen-avatar-container").appendChild(wrapDiv)}(globalThis);`;
-        document.body.appendChild(script);
-
-        // Cleanup function
-        return () => {
-          const embed = document.getElementById('heygen-streaming-embed');
-          if (embed) {
-            embed.remove();
-          }
-          if (script.parentNode) {
-            script.parentNode.removeChild(script);
-          }
-        };
+        scriptElement = document.createElement('script');
+        scriptElement.innerHTML = '!function(window){const host="https://labs.heygen.com",url=host+"/guest/streaming-embed?share=eyJxdWFsaXR5IjoiaGlnaCIsImF2YXRhck5hbWUiOiJUaGFkZGV1c19Qcm9mZXNzaW9uYWxMb29r%0D%0AX3B1YmxpYyIsInByZXZpZXdJbWciOiJodHRwczovL2ZpbGVzMi5oZXlnZW4uYWkvYXZhdGFyL3Yz%0D%0ALzhkYzJjYWExNzJjZDRlNjc5NmIzN2U5ZjE2OTU0YjdlXzU1OTUwL3ByZXZpZXdfdGFyZ2V0Lndl%0D%0AYnAiLCJuZWVkUmVtb3ZlQmFja2dyb3VuZCI6dHJ1ZSwia25vd2xlZGdlQmFzZUlkIjoiNTY0OWZl%0D%0AZTc5YjlkNDFiNDlmNDEyYzM3ODM5NTQwY2QiLCJ1c2VybmFtZSI6IjI0MGU3NDU3OGUzNTQ1MzM5%0D%0AMmIwYmU5MGE2OTE0NDNmIn0%3D&inIFrame=1",clientWidth=document.body.clientWidth,wrapDiv=document.createElement("div");wrapDiv.id="heygen-streaming-embed";const container=document.createElement("div");container.id="heygen-streaming-container";const stylesheet=document.createElement("style");stylesheet.innerHTML=`\n  #heygen-streaming-embed {\n    z-index: 999;\n    position: relative;\n    margin: 0 auto;\n    width: 600px;\n    height: 600px;\n    border-radius: 50%;\n    border: 2px solid #fff;\n    box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.12);\n    transition: all linear 0.1s;\n    overflow: hidden;\n\n    opacity: 0;\n    visibility: hidden;\n  }\n  #heygen-streaming-embed.show {\n    opacity: 1;\n    visibility: visible;\n  }\n  #heygen-streaming-embed.expand {\n    ${clientWidth<540?"height: 798px; width: 96%; margin: 0 auto;":"height: 1098px; width: calc(1098px * 16 / 9); margin: 0 auto;"}\n    border: 0;\n    border-radius: 8px;\n  }\n  #heygen-streaming-container {\n    width: 100%;\n    height: 100%;\n  }\n  #heygen-streaming-container iframe {\n    width: 100%;\n    height: 100%;\n    border: 0;\n  }\n  `;const iframe=document.createElement("iframe");iframe.allowFullscreen=!1,iframe.title="Streaming Embed",iframe.role="dialog",iframe.allow="microphone",iframe.src=url;let visible=!1,initial=!1;window.addEventListener("message",(e=>{e.origin===host&&e.data&&e.data.type&&"streaming-embed"===e.data.type&&("init"===e.data.action?(initial=!0,wrapDiv.classList.toggle("show",initial)):"show"===e.data.action?(visible=!0,wrapDiv.classList.toggle("expand",visible)):"hide"===e.data.action&&(visible=!1,wrapDiv.classList.toggle("expand",visible)))})),container.appendChild(iframe),wrapDiv.appendChild(stylesheet),wrapDiv.appendChild(container),document.getElementById("heygen-avatar-container").appendChild(wrapDiv)}(globalThis);';
+        document.body.appendChild(scriptElement);
       }
     }, 100);
 
-    return () => clearInterval(waitForContainer);
+    return () => {
+      clearInterval(waitForContainer);
+      const embed = document.getElementById('heygen-streaming-embed');
+      if (embed) {
+        embed.remove();
+      }
+      if (scriptElement?.parentNode) {
+        scriptElement.parentNode.removeChild(scriptElement);
+      }
+    };
   }, []);
 
   return (
@@ -132,12 +132,10 @@ const MyCompanion = () => {
         transition={{ duration: 0.6, delay: 0.25 }}
         className="py-16 px-4 sm:px-6 lg:px-8 bg-white"
       >
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl font-bold text-gray-900 mb-12 text-center">Start Your Conversation</h2>
-          <div className="flex flex-col items-center justify-center">
-            <div id="heygen-avatar-container" className="w-full flex justify-center items-center min-h-[250px]">
-              {/* HeyGen Avatar will be injected here - centered */}
-            </div>
+          <div id="heygen-avatar-container" className="w-full flex justify-center items-center">
+            {/* HeyGen Avatar will be injected here - centered */}
           </div>
         </div>
       </motion.section>

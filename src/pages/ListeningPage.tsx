@@ -13,7 +13,13 @@ const ListeningPage = () => {
   const [selectedTopic, setSelectedTopic] = useState<string>('All Topics');
 
   const listeningContent: ListeningItem[] = [
+    // Unit 1
     { id: 'li_01-01', title: 'Short Conversations (A1)', level: 'A1', topic: 'Conversations' },
+    // Unit 2
+    { id: 'li_02-01', title: 'Understanding Directions', level: 'A1', topic: 'Directions' },
+    { id: 'li_02-02', title: 'Shopping Conversations', level: 'A1', topic: 'Shopping' },
+    { id: 'li_02-03', title: 'Landmarks & Locations', level: 'A1', topic: 'Directions' },
+    { id: 'li_02-04', title: 'Prices & Numbers', level: 'A1', topic: 'Shopping' },
   ];
 
   const filteredListening = selectedTopic === 'All Topics'
@@ -63,7 +69,7 @@ const ListeningPage = () => {
             >
               <h3 className="text-xl font-bold text-indigo-700 mb-2">{item.title}</h3>
               <div className="flex justify-between items-center">
-                {item.id === 'li_01-01' ? (
+                {(item.id.startsWith('li_01-') || item.id.startsWith('li_02-')) ? (
                   <Link
                     to={`/quiz/${item.id}`}
                     className="text-sm text-blue-500 hover:underline"
