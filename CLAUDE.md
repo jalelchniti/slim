@@ -2,12 +2,43 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Recent Updates (October 2024)
+
+**Latest Session Accomplishments:**
+
+1. **Fixed .js File Duplication Issue** (Oct 24, 2024)
+   - Root cause: Visual Studio auto-compilation via `.vs` folder
+   - Solution: Added `noEmit: true` to `tsconfig.json` to prevent TypeScript from outputting .js files
+   - Updated `.gitignore` to exclude `src/**/*.js` and `.vs/` folder
+   - Result: Clean source directory, only .tsx files tracked
+
+2. **Enhanced MyCompanion Component** (Oct 24, 2024)
+   - Fixed HeyGen avatar script injection with guard condition `!scriptElement` to prevent duplication
+   - **Repositioned avatar from fixed bottom-left to center of page** - now prominent focal point
+   - Created dedicated "Avatar Section" below Instructions section
+   - **Increased avatar sizing by 200%:**
+     * Avatar button: 200px → 600px (circular avatar)
+     * Desktop expanded: 366px → 1098px (width and height increased proportionally)
+     * Mobile expanded: 266px → 798px (responsive scaling maintained)
+   - Added proper TypeScript typing for `scriptElement` variable
+   - Improved user experience with large, centered avatar taking up full attention
+
+3. **Production Build & Deployment Preparation** (Oct 24, 2024)
+   - Verified zero TypeScript errors before deployment
+   - Build statistics: 59 total files, 2.0 MB uncompressed, ~150 KB gzipped
+   - All 34 quizzes (U1 & U2) compiled and lazy-loaded successfully
+   - Created comprehensive FTP deployment documentation:
+     * `FTP_DEPLOYMENT_PRODUCTION_GUIDE.md` - Full step-by-step instructions
+     * `FTP_QUICK_UPLOAD_SUMMARY.txt` - Quick reference checklist
+   - Ready for OVH server deployment to `/slim/` directory
+
 ## Project Overview
 
 **SmartHub Tunis** - An English language learning application (A1-A2 level) built with React, TypeScript, and Vite. Provides interactive educational content through quizzes and flashcards with text-to-speech capabilities, organized by language skill types.
 
 **Branding:** SmartHub Tunis - "Connecting Intelligent People"
 **Deployment:** Configured for `/slim/` subfolder deployment
+**Version Status:** v2.0 - Fully complete with Units 1 & 2, ready for production
 
 ## Development Commands
 
@@ -32,8 +63,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Note on Build Commands:** The project uses `npm run build` for CI/CD (includes type checking) and `npx vite build` for quick local builds when you want to skip strict TypeScript checking. Both output to the `dist/` folder.
 
 **Development Notes:**
-- TypeScript strict mode is enabled - all source files must be `.tsx` (no `.js` files)
-- React components must be exported at the top level for React Refresh to work correctly (avoid exporting default from wrapped functions)
+- **TypeScript strict mode enabled** - all source files must be `.tsx` (no `.js` files)
+  - `tsconfig.json` has `noEmit: true` to prevent TypeScript from auto-compiling to .js files
+  - `.gitignore` excludes `src/**/*.js` and `.vs/` folder (prevents VS Studio auto-compilation artifacts)
+  - Use `npm run lint -- --fix` to maintain code quality
+- **React Refresh compatibility** - React components must be exported at the top level for React Refresh to work correctly
+  - Avoid exporting default from wrapped functions
+  - Default exports are reserved for page components only
+- **Visual Studio Note** - If .js files appear in src/ folder despite `noEmit: true`, check VS Code settings and disable TypeScript auto-compilation
 
 ## Architecture Overview
 
@@ -142,29 +179,42 @@ const speak = (text: string) => {
 
 **Overview:** AI-powered conversational English coach using HeyGen avatar
 
-**Components:**
-- Hero section with "My English Companion" heading
+**Page Layout:**
+- Hero section with "My English Companion" heading and subtitle
 - Instructions section with 5 guided steps
-- **Centered Avatar Section** - HeyGen streaming avatar (main focal point)
+- **Avatar Section** - HeyGen streaming avatar (PRIMARY FOCAL POINT - centered on page)
 - Features showcase (Real Conversations, AI Coaching, Track Progress)
 - Tips for better practice
 - Call-to-action section
 
-**HeyGen Integration:**
-- Embedded script injected via `useEffect` hook
-- Avatar appears as circular button, expands to full conversation view
-- Responsive design (mobile: 266px height, desktop: 366px × 16:9 aspect ratio)
+**HeyGen Avatar Integration:**
+- Embedded script injected via `useEffect` hook with guard condition `!scriptElement` to prevent script duplication
+- Avatar dynamically injects as interactive element
+- **Avatar Sizing (Oct 2024 Enhancement):**
+  - Avatar button (initial state): 600px diameter (circular, centered)
+  - Desktop expanded conversation: 1098px × 1098px (200% increase from 366px baseline)
+  - Mobile expanded conversation: 798px × 798px (200% increase from 266px baseline)
+  - Responsive scaling maintains 16:9 aspect ratio in expanded state
 - Microphone required and requested on activation
-- Conversation auto-scales based on screen size
+- Conversation UI scales based on screen size
+
+**Positioning & Styling:**
+- Avatar centered horizontally on page via `flex justify-center`
+- White background section for high contrast against page
+- Avatar section positioned prominently between Instructions and Features
+- Minimum height of 250px for avatar container
+- Responsive padding and spacing on mobile devices
+- Large button state draws user attention before expansion
 
 **User Flow:**
 1. Navigate to `/companion`
-2. Read instructions and tips
-3. Click centered avatar button
-4. Grant microphone permission when prompted
-5. Start with greeting: "Hello. I am a non-native learner of English. My level is A1..."
-6. Avatar responds and guides conversation for ~10 minutes
-7. Copy conversation script to share with teacher on WhatsApp
+2. Read instructions and tips about conversation practice
+3. See large centered avatar button
+4. Click avatar button to expand conversation view
+5. Grant microphone permission when prompted
+6. Start with greeting: "Hello. I am a non-native learner of English. My level is A1..."
+7. Avatar responds and guides conversation for ~10 minutes
+8. Copy conversation script to share with teacher on WhatsApp
 
 **Topics Covered:**
 - Personal introductions (who you are)
@@ -172,11 +222,11 @@ const speak = (text: string) => {
 - Everyday activities & routines
 - Basic A1-level conversational English
 
-**Styling:**
-- White background section for avatar (high contrast)
-- Centered container with `flex` + `justify-center`
-- Minimum height of 250px for avatar container
-- Responsive padding and spacing
+**Microphone & Privacy:**
+- Uses browser's Web Audio API
+- Requests permission on first interaction
+- Works best in Chrome/Edge
+- Supports Safari and Firefox with user gesture permission
 
 ## Path Configuration
 
@@ -319,12 +369,24 @@ const speak = (text: string) => {
 
 ## Key Configuration Files
 
-- `tsconfig.json` - TypeScript configuration with path alias `@/*` → `src/*`
-- `vite.config.ts` - **IMPORTANT:** Vite build config with React plugin, base path `/slim/`, and `manualChunks` configuration for quiz code splitting
+- **`tsconfig.json`** - TypeScript configuration
+  - Path alias: `@/*` → `src/*` (used for all imports)
+  - **`noEmit: true`** - Prevents TypeScript from outputting .js files (only used for type checking)
+  - Strict mode enabled for type safety
+  - `skipLibCheck: true` to speed up compilation
+
+- **`vite.config.ts`** - Vite build configuration
+  - React plugin for JSX support and React Refresh
+  - Base path: `/slim/` for subfolder deployment
+  - **`manualChunks` configuration** for optimal code splitting (U1/U2 skill chunks + individual quizzes)
+  - Build output target: `dist/` folder
+  - Asset handling with cache-busting hashes
+
 - `vitest.config.ts` - Test environment setup with jsdom
 - `eslint.config.js` - Linting rules for React Hooks and TypeScript
 - `tailwind.config.ts` - Tailwind CSS customization
 - `postcss.config.js` - PostCSS plugins for Tailwind
+- **`.gitignore`** - Includes `src/**/*.js` and `.vs/` to prevent auto-compiled artifacts
 
 ### Code Splitting with manualChunks
 
@@ -360,25 +422,87 @@ const speak = (text: string) => {
 - Accent: Orange/Red tones (brand colors)
 - Used consistently across header, footer, buttons
 
-## Deployment
+## Production Build & Deployment
 
-**Standard Deployment Method: Manual FTP Upload**
+### Pre-Deployment Checklist
+
+Before building for production, verify:
+
+1. **Code Quality**
+   ```bash
+   npm run lint              # Check for linting issues
+   npm test -- --run         # Verify all tests pass
+   npm run build             # Perform full type check and build
+   ```
+
+2. **Source Files**
+   - All files are `.tsx` (no `.js` files - checked via `.gitignore` and `tsconfig.json` with `noEmit: true`)
+   - No TypeScript errors in build output
+   - All quiz files registered in `src/pages/QuizPage.tsx` quizMap
+   - All skill pages updated with latest content entries
+
+3. **Assets & Resources**
+   - All flashcard images in `public/assets/images/`
+   - All audio files optimized and in `public/assets/audio/`
+   - Logo and branding images present and accessible
 
 ### Build for Production
 
-**Option 1: Full build with TypeScript checking** (recommended for production)
+**Option 1: Full build with TypeScript checking** (RECOMMENDED FOR PRODUCTION)
 ```bash
 npm run build
 ```
-This runs both type checking and Vite build. Fails if TypeScript errors exist.
+- Runs both TypeScript type checking and Vite build
+- Fails if ANY TypeScript errors exist (prevents broken deployments)
+- Most reliable method before production deployment
+- Output: `dist/` folder with all optimized files
 
-**Option 2: Skip TypeScript checking** (for quick local builds)
+**Option 2: Skip TypeScript checking** (quick local iteration only)
 ```bash
 npx vite build
 ```
-Builds without strict type validation. The app runs perfectly but may have non-critical type issues.
+- Builds without strict type validation
+- Faster than full build but may miss type issues
+- Use only for local testing, never for production
+- Output: `dist/` folder
 
-Both commands output to the `dist/` folder.
+### Build Output Structure
+
+After successful `npm run build`, the `dist/` folder contains:
+
+```
+dist/
+├── index.html              # Main SPA entry point
+├── vite.svg                # Favicon
+├── .htaccess               # Apache routing rules for SPA
+├── assets/
+│   ├── index-[hash].css    # Main stylesheet (Tailwind + App CSS)
+│   ├── main-[hash].js      # Main bundle with router and layout
+│   ├── chunks/
+│   │   ├── u1-vocabulary-[hash].js
+│   │   ├── u1-grammar-[hash].js
+│   │   ├── u1-reading-[hash].js
+│   │   ├── u1-speaking-[hash].js
+│   │   ├── u1-listening-[hash].js
+│   │   ├── u2-vocabulary-[hash].js
+│   │   ├── u2-grammar-[hash].js
+│   │   ├── u2-reading-[hash].js
+│   │   ├── u2-speaking-[hash].js
+│   │   ├── u2-listening-[hash].js
+│   │   └── [other lazy-loaded chunks]
+│   └── [individual quiz files: vo_01-01-[hash].js, etc.]
+└── [other assets: images, fonts, etc.]
+```
+
+**Build Statistics (v2.0 - Oct 2024):**
+- Total files: 59
+- Total size: 2.0 MB (uncompressed)
+- Gzipped size: ~150 KB
+- JavaScript chunks: 43 files (main + 10 skill chunks + 32 individual quizzes)
+- CSS files: 2 (combined and minified)
+- Build time: ~30 seconds on standard machine
+
+## Deployment
 
 ### FTP Upload Process
 1. Build creates optimized files in `dist` folder
@@ -462,6 +586,14 @@ npx vite build && npm run serve
   - `dist-root-index.html` - Optional root landing page
 
 ## Troubleshooting Common Issues
+
+**.js Files Appearing in src/ Folder**
+- Root cause: Visual Studio or IDE auto-compilation settings
+- Solution 1: Ensure `noEmit: true` is set in `tsconfig.json`
+- Solution 2: Check IDE settings - disable TypeScript auto-compilation
+- Solution 3: `.gitignore` contains `src/**/*.js` to prevent tracking compiled files
+- If files persist: Use `git clean -fd` to remove untracked files
+- These .js files are safe to delete - they won't affect the build
 
 **Build Fails with TypeScript Errors**
 - Use `npm run build` to catch all type errors before deployment

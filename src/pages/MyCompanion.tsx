@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 const MyCompanion = () => {
   useEffect(() => {
-    let scriptElement = null;
+    let scriptElement: HTMLScriptElement | null = null;
 
     // Wait for avatar container to be available
     const waitForContainer = setInterval(() => {
